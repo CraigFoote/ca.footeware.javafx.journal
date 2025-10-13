@@ -6,12 +6,12 @@ import javafx.fxml.FXML;
 public class HomePageController {
 
     @FXML
-    private void switchToOpenPage() throws IOException {
+    private void onSwitchToOpenPageAction() throws IOException {
         App.setRoot("openPage");
     }
     
     @FXML
-    private void switchToNewPage() throws IOException {
+    private void onSitchToNewPageAction() throws IOException {
         App.setRoot("newPage");
     }
 }

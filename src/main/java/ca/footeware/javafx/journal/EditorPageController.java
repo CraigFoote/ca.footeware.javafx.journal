@@ -1,14 +1,12 @@
 package ca.footeware.javafx.journal;
 
-import java.awt.Rectangle;
+import java.time.LocalDate;
+import java.time.YearMonth;
 
-import javax.swing.SwingUtilities;
-
-import datechooser.view.CalendarPane;
-import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
+import javafx.geometry.HPos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 
 /**
  * MVC Controller for the "Editor" page.
@@ -16,39 +14,69 @@ import javafx.scene.layout.HBox;
 public class EditorPageController {
 
 	@FXML
-	private HBox calendarBox;
+	private GridPane dateGrid;
+	private int lengthOfMonth;
 
 	@FXML
-	private Button firstButton;
-
-	@FXML
-	private Button previousButton;
-
-	@FXML
-	private Button todayButton;
-
-	@FXML
-	private Button nextButton;
-
-	@FXML
-	private Button lastButton;
-
-	void createCalendar() {
-		SwingNode swingNode = new SwingNode();
-		createSwingContent(swingNode);
-		calendarBox.setMinWidth(220);
-		calendarBox.getChildren().add(swingNode);
+	public void onPreviousYearAction() {
+		App.sayHello();
 	}
 
-	private void createSwingContent(final SwingNode swingNode) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				CalendarPane datePanel = new CalendarPane();
-				datePanel.setBounds(new Rectangle(10, 10, 200, 200));
-				swingNode.setContent(datePanel);
-			}
-		});
+	@FXML
+	public void onNextYearAction() {
+		App.sayHello();
 	}
 
+	@FXML
+	public void onPreviousMonthAction() {
+		App.sayHello();
+	}
+
+	@FXML
+	public void onNextMonthAction() {
+		App.sayHello();
+	}
+
+	@FXML
+	public void onFirstEntryAction() {
+		App.sayHello();
+	}
+
+	@FXML
+	public void onPreviousEntryAction() {
+		App.sayHello();
+	}
+
+	@FXML
+	public void onTodayAction() {
+		YearMonth ym = YearMonth.now();
+		lengthOfMonth = ym.lengthOfMonth();
+
+		dateGrid.getChildren().clear();
+
+		// find the column index of the 1st day with Sunday=0
+		LocalDate firstOfMonth = ym.atDay(1);
+		int firstColumn = firstOfMonth.getDayOfWeek().getValue() % 7;
+
+		// fill days (weeks run Sunday..Saturday), start at row 0
+		for (int day = 1; day <= lengthOfMonth; day++) {
+			int index = firstColumn + (day - 1);
+			int row = index / 7;
+			int col = index % 7;
+
+			Label dayLabel = new Label(Integer.toString(day));
+			GridPane.setHalignment(dayLabel, HPos.CENTER);
+			dateGrid.add(dayLabel, col, row);
+		}
+	}
+
+	@FXML
+	public void onNextEntryAction() {
+		App.sayHello();
+	}
+
+	@FXML
+	public void onLastEntryAction() {
+		App.sayHello();
+	}
 }

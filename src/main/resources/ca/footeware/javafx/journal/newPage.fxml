@@ -47,7 +47,7 @@
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin></Label>
-      <Button fx:id="browseButton" mnemonicParsing="false" onAction="#browseForJournalFolder" text="Browse" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2">
+      <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseForJournalFolderAction" text="Browse" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2">
          <GridPane.margin>
             <Insets right="20.0" />
          </GridPane.margin></Button>
@@ -59,12 +59,12 @@
             <Insets right="20.0" />
          </GridPane.margin>
       </PasswordField>
-      <Button fx:id="createButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#createJournal" text="Create Journal" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+      <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onCreateJournalAction" text="Create Journal" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
          <GridPane.margin>
             <Insets right="20.0" />
          </GridPane.margin>
       </Button>
-      <Button fx:id="backButton" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#switchToHomePage" prefHeight="40.0" prefWidth="25.0" GridPane.hgrow="NEVER" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+      <Button alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onSwitchToHomePageAction" prefHeight="40.0" prefWidth="25.0" GridPane.hgrow="NEVER" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
          <font>
             <Font size="32.0" />
          </font>

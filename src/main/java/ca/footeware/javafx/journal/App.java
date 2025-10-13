@@ -27,11 +27,11 @@ public class App extends Application {
         notificationPane = new NotificationPane(root);
         notificationPane.setShowFromTop(false);
         notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
-        scene = new Scene(notificationPane, 450, 450);
+        scene = new Scene(notificationPane, 450, 525);
         stage.setScene(scene);
         stage.show();
     }
-
+    
     static void setRoot(String fxml) throws IOException {
         Parent page = loadFXML(fxml);
         notificationPane.setContent(page);
@@ -39,12 +39,7 @@ public class App extends Application {
 
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        Parent parent = fxmlLoader.load();
-        if (fxml.equals("editorPage")) {
-			EditorPageController controller = fxmlLoader.getController();
-			controller.createCalendar();
-		}
-        return parent;
+        return fxmlLoader.load();
     }
 
     public static NotificationPane getNotificationPane() {
