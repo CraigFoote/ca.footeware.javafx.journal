@@ -14,8 +14,13 @@ import javafx.scene.layout.GridPane;
 public class EditorPageController {
 
 	@FXML
+	private Label yearLabel;
+
+	@FXML
+	private Label monthLabel;
+
+	@FXML
 	private GridPane dateGrid;
-	private int lengthOfMonth;
 
 	@FXML
 	public void onPreviousYearAction() {
@@ -49,16 +54,31 @@ public class EditorPageController {
 
 	@FXML
 	public void onTodayAction() {
-		YearMonth ym = YearMonth.now();
-		lengthOfMonth = ym.lengthOfMonth();
+		App.sayHello();
+	}
+
+	@FXML
+	public void onNextEntryAction() {
+		App.sayHello();
+	}
+
+	@FXML
+	public void onLastEntryAction() {
+		App.sayHello();
+	}
+
+	private void drawMonth(YearMonth ym) {
+		yearLabel.setText(String.valueOf(ym.getYear()));
+		monthLabel.setText(ym.getMonth().toString());
 
 		dateGrid.getChildren().clear();
+
+		int lengthOfMonth = ym.lengthOfMonth();
 
 		// find the column index of the 1st day with Sunday=0
 		LocalDate firstOfMonth = ym.atDay(1);
 		int firstColumn = firstOfMonth.getDayOfWeek().getValue() % 7;
 
-		// fill days (weeks run Sunday..Saturday), start at row 0
 		for (int day = 1; day <= lengthOfMonth; day++) {
 			int index = firstColumn + (day - 1);
 			int row = index / 7;
@@ -70,13 +90,7 @@ public class EditorPageController {
 		}
 	}
 
-	@FXML
-	public void onNextEntryAction() {
-		App.sayHello();
-	}
-
-	@FXML
-	public void onLastEntryAction() {
-		App.sayHello();
+	public void init() {
+		drawMonth(YearMonth.now());
 	}
 }

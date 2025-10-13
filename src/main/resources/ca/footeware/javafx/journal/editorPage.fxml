@@ -25,7 +25,7 @@
                         <Insets />
                      </HBox.margin>
                   </Button>
-                  <Label text="YEAR">
+                  <Label fx:id="yearLabel" alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" prefWidth="40.0">
                      <HBox.margin>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
                      </HBox.margin>
@@ -47,7 +47,7 @@
                         <Insets />
                      </HBox.margin>
                   </Button>
-                  <Label text="MON">
+                  <Label fx:id="monthLabel" alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" prefWidth="70.0">
                      <HBox.margin>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
                      </HBox.margin>
@@ -90,7 +90,7 @@
             <Label text="Sat" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
          </children>
       </GridPane>
-      <GridPane fx:id="dateGrid" hgap="2.0" style="-fx-background-color: #555;" vgap="2.0">
+      <GridPane fx:id="dateGrid" hgap="2.0" maxWidth="600.0" style="-fx-background-color: #555;" vgap="2.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -114,10 +114,10 @@
       <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="430.0" spacing="5.0">
          <children>
             <Button maxWidth="-Infinity" mnemonicParsing="false" onAction="#onFirstEntryAction" prefWidth="100.0" text="First" textFill="WHITE" />
-            <Button layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onPreviousEntryAction" prefWidth="100.0" text="Previous" />
+            <Button layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onPreviousEntryAction" prefWidth="100.0" text="Previous" textFill="WHITE" />
             <Button layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onTodayAction" prefWidth="100.0" text="Today" textFill="WHITE" />
-            <Button layoutX="119.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onNextEntryAction" prefWidth="100.0" text="Next" />
-            <Button layoutX="174.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onLastEntryAction" prefWidth="100.0" text="Last" />
+            <Button layoutX="119.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onNextEntryAction" prefWidth="100.0" text="Next" textFill="WHITE" />
+            <Button layoutX="174.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onLastEntryAction" prefWidth="100.0" text="Last" textFill="WHITE" />
          </children>
          <VBox.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
