@@ -28,18 +28,14 @@ public class App extends Application {
 		notificationPane = new NotificationPane(root);
 		notificationPane.setShowFromTop(false);
 		notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
-		setRoot("editorPage");
 		scene = new Scene(notificationPane, 550, 700);
 		stage.setScene(scene);
 		stage.show();
 	}
 
 	static void setRoot(String fxml) throws IOException {
+		loadFXML(fxml);
 		Parent page = loader.getRoot();
-		Object controller = loader.getController();
-		if (controller instanceof EditorPageController editorController) {
-			editorController.init();
-		}
 		notificationPane.setContent(page);
 	}
 

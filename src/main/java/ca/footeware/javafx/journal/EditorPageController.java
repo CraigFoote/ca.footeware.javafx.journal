@@ -3,10 +3,16 @@ package ca.footeware.javafx.journal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 /**
  * MVC Controller for the "Editor" page.
@@ -21,6 +27,9 @@ public class EditorPageController {
 
 	@FXML
 	private GridPane dateGrid;
+
+	@FXML
+	private TextArea textArea;
 
 	@FXML
 	public void onPreviousYearAction() {
@@ -67,6 +76,16 @@ public class EditorPageController {
 		App.sayHello();
 	}
 
+	@FXML
+	private void initialize() {
+		YearMonth thisMonth = YearMonth.now();
+		drawMonth(thisMonth);
+
+		Platform.runLater(() -> {
+			textArea.requestFocus();
+		});
+	}
+
 	private void drawMonth(YearMonth ym) {
 		yearLabel.setText(String.valueOf(ym.getYear()));
 		monthLabel.setText(ym.getMonth().toString());
@@ -86,11 +105,33 @@ public class EditorPageController {
 
 			Label dayLabel = new Label(Integer.toString(day));
 			GridPane.setHalignment(dayLabel, HPos.CENTER);
+
+			final int finalDay = day;
+			dayLabel.setOnMouseClicked(e -> onDayLabelClicked(finalDay));
+			dayLabel.setCursor(javafx.scene.Cursor.HAND);
+
 			dateGrid.add(dayLabel, col, row);
+		}
+
+		int today = LocalDate.now().getDayOfMonth();
+		for (Node node : dateGrid.getChildren()) {
+			if (node instanceof Label label) {
+				if (label.getText().equals(String.valueOf(today))) {
+					Font current = label.getFont();
+					label.setFont(Font.font(current.getFamily(), FontWeight.EXTRA_BOLD, current.getSize() + 1.0));
+					label.setTextFill(Color.RED);
+					break;
+				}
+			}
 		}
 	}
 
-	public void init() {
-		drawMonth(YearMonth.now());
+	private void onDayLabelClicked(int day) {
+		System.out.println("Clicked day: " + day);
+		textArea.setText("Entry for " + day);
+		Platform.runLater(() -> {
+			textArea.requestFocus();
+			textArea.positionCaret(textArea.getText().length());
+		});
 	}
 }

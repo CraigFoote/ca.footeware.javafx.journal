@@ -27,7 +27,7 @@
                   </Button>
                   <Label fx:id="yearLabel" alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" prefWidth="40.0">
                      <HBox.margin>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="12.0" />
                      </HBox.margin>
                   </Label>
                   <Button mnemonicParsing="false" onAction="#onNextYearAction" text="&gt;" textFill="WHITE">
@@ -49,7 +49,7 @@
                   </Button>
                   <Label fx:id="monthLabel" alignment="CENTER" contentDisplay="CENTER" minWidth="-Infinity" prefWidth="70.0">
                      <HBox.margin>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="12.0" />
                      </HBox.margin>
                   </Label>
                   <Button mnemonicParsing="false" onAction="#onNextMonthAction" text="&gt;" textAlignment="CENTER" textFill="WHITE">
@@ -123,7 +123,7 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </VBox.margin>
       </HBox>
-      <TextArea prefHeight="214.0" prefWidth="430.0" style="-fx-background-color: #555;" wrapText="true" VBox.vgrow="ALWAYS">
+      <TextArea fx:id="textArea" prefHeight="214.0" prefWidth="430.0" style="-fx-background-color: #555;" wrapText="true" VBox.vgrow="ALWAYS">
          <VBox.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </VBox.margin>

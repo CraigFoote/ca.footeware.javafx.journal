@@ -6,14 +6,13 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 
 /**
  * MVC Controller for the "Open" page.
  */
 public class NewPageController {
-	
+
 	@FXML
 	private Button browseButton;
 
@@ -44,7 +43,8 @@ public class NewPageController {
 	private void onCreateJournalAction() {
 		try {
 			verifyInputs();
-			JournalManager.createNewJournal(browseButton.getText(), nameField.getText().trim(), passwordField1.getText());
+			JournalManager.createNewJournal(browseButton.getText(), nameField.getText().trim(),
+					passwordField1.getText());
 		} catch (IllegalArgumentException | IOException e) {
 			App.getNotificationPane().setText(e.getMessage());
 			App.getNotificationPane().show();
