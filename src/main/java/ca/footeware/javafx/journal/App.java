@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.controlsfx.control.NotificationPane;
 
-import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.NordDark;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,7 +23,7 @@ public class App extends Application {
 
 	@Override
 	public void start(Stage stage) throws IOException {
-		Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+		Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
 		Parent root = loadFXML("editorPage");
 		notificationPane = new NotificationPane(root);
 		notificationPane.setShowFromTop(false);

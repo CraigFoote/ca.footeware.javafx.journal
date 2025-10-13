@@ -1,6 +1,7 @@
 package ca.footeware.javafx.journal;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.YearMonth;
 
 import javafx.application.Platform;
@@ -31,24 +32,38 @@ public class EditorPageController {
 	@FXML
 	private TextArea textArea;
 
+	private YearMonth currentYearMonth;
+
 	@FXML
 	public void onPreviousYearAction() {
-		App.sayHello();
+		YearMonth yesterYear = YearMonth.of(currentYearMonth.getYear() - 1, currentYearMonth.getMonth());
+		drawMonth(yesterYear);
 	}
 
 	@FXML
 	public void onNextYearAction() {
-		App.sayHello();
+		YearMonth nextYear = YearMonth.of(currentYearMonth.getYear() + 1, currentYearMonth.getMonth());
+		drawMonth(nextYear);
 	}
 
 	@FXML
 	public void onPreviousMonthAction() {
-		App.sayHello();
+		// if current is Jan. wrap to Dec.
+		Month previousMonthEnum = currentYearMonth.getMonth() == Month.JANUARY ? Month.DECEMBER
+				: Month.of(currentYearMonth.getMonthValue() - 1);
+
+		YearMonth previousMonth = YearMonth.of(currentYearMonth.getYear(), previousMonthEnum);
+		drawMonth(previousMonth);
 	}
 
 	@FXML
 	public void onNextMonthAction() {
-		App.sayHello();
+		// if current is Dec. wrap to Jan.
+		Month nextMonthEnum = currentYearMonth.getMonth() == Month.DECEMBER ? Month.JANUARY
+				: Month.of(currentYearMonth.getMonthValue() + 1);
+
+		YearMonth nextMonth = YearMonth.of(currentYearMonth.getYear(), nextMonthEnum);
+		drawMonth(nextMonth);
 	}
 
 	@FXML
@@ -63,7 +78,7 @@ public class EditorPageController {
 
 	@FXML
 	public void onTodayAction() {
-		App.sayHello();
+		drawMonth(YearMonth.now());
 	}
 
 	@FXML
@@ -78,24 +93,21 @@ public class EditorPageController {
 
 	@FXML
 	private void initialize() {
-		YearMonth thisMonth = YearMonth.now();
-		drawMonth(thisMonth);
-
-		Platform.runLater(() -> {
-			textArea.requestFocus();
-		});
+		drawMonth(YearMonth.now());
+		Platform.runLater(() -> textArea.requestFocus());
 	}
 
 	private void drawMonth(YearMonth ym) {
-		yearLabel.setText(String.valueOf(ym.getYear()));
-		monthLabel.setText(ym.getMonth().toString());
+		currentYearMonth = ym;
+		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
+		monthLabel.setText(currentYearMonth.getMonth().toString());
 
 		dateGrid.getChildren().clear();
 
-		int lengthOfMonth = ym.lengthOfMonth();
+		int lengthOfMonth = currentYearMonth.lengthOfMonth();
 
 		// find the column index of the 1st day with Sunday=0
-		LocalDate firstOfMonth = ym.atDay(1);
+		LocalDate firstOfMonth = currentYearMonth.atDay(1);
 		int firstColumn = firstOfMonth.getDayOfWeek().getValue() % 7;
 
 		for (int day = 1; day <= lengthOfMonth; day++) {
@@ -107,18 +119,21 @@ public class EditorPageController {
 			GridPane.setHalignment(dayLabel, HPos.CENTER);
 
 			final int finalDay = day;
-			dayLabel.setOnMouseClicked(e -> onDayLabelClicked(finalDay));
+			dayLabel.setOnMouseClicked(_ -> onDayLabelClicked(finalDay));
 			dayLabel.setCursor(javafx.scene.Cursor.HAND);
 
 			dateGrid.add(dayLabel, col, row);
 		}
 
-		int today = LocalDate.now().getDayOfMonth();
-		for (Node node : dateGrid.getChildren()) {
-			if (node instanceof Label label) {
-				if (label.getText().equals(String.valueOf(today))) {
-					Font current = label.getFont();
-					label.setFont(Font.font(current.getFamily(), FontWeight.EXTRA_BOLD, current.getSize() + 1.0));
+		// if #currentYearMonth is in current year and month, highlight today
+		LocalDate now = LocalDate.now();
+		if (now.getYear() == currentYearMonth.getYear() && now.getMonthValue() == currentYearMonth.getMonthValue()) {
+			int todayIndex = now.getDayOfMonth(); // 1-based
+			for (Node node : dateGrid.getChildren()) {
+				if (node instanceof Label label && label.getText().equals(String.valueOf(todayIndex))) {
+					Font currentFont = label.getFont();
+					label.setFont(
+							Font.font(currentFont.getFamily(), FontWeight.EXTRA_BOLD, currentFont.getSize() + 1.0));
 					label.setTextFill(Color.RED);
 					break;
 				}
