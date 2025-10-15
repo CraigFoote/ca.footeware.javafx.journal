@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="525.0" prefWidth="497.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.footeware.javafx.journal.EditorPageController">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="597.0" prefWidth="497.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.footeware.javafx.journal.EditorPageController">
    <children>
       <HBox alignment="CENTER" fillHeight="false" prefHeight="1.0" prefWidth="430.0" spacing="20.0">
          <children>
@@ -124,7 +124,7 @@
             <Insets left="10.0" right="10.0" top="10.0" />
          </VBox.margin>
       </HBox>
-      <TextArea fx:id="textArea" prefHeight="214.0" prefWidth="430.0" style="-fx-background-color: #555;" wrapText="true" VBox.vgrow="ALWAYS">
+      <TextArea fx:id="textArea" prefHeight="194.0" prefWidth="477.0" style="-fx-background-color: #555;" wrapText="true" VBox.vgrow="ALWAYS">
          <VBox.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </VBox.margin>
@@ -132,5 +132,10 @@
             <Font size="16.0" />
          </font>
       </TextArea>
+      <Button maxHeight="-Infinity" maxWidth="100.0" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onSaveAction" prefHeight="35.0" prefWidth="100.0" text="Save" textFill="WHITE">
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
+      </Button>
    </children>
 </VBox>

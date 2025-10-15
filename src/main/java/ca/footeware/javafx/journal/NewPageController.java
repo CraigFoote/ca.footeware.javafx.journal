@@ -2,6 +2,7 @@ package ca.footeware.javafx.journal;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -26,12 +27,12 @@ public class NewPageController {
 	private TextField passwordField2;
 
 	@FXML
-	private void onSwitchToHomePageAction() throws IOException {
+	private void onSwitchToHomePageAction() throws IOException, URISyntaxException {
 		App.setRoot("homePage");
 	}
 
 	@FXML
-	private void onBrowseForJournalFolderAction() throws IOException {
+	private void onBrowseForJournalFolderAction() {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		File selectedDirectory = directoryChooser.showDialog(App.getPrimaryStage());
 		if (selectedDirectory != null) {
@@ -45,9 +46,9 @@ public class NewPageController {
 			verifyInputs();
 			JournalManager.createNewJournal(browseButton.getText(), nameField.getText().trim(),
 					passwordField1.getText());
-		} catch (IllegalArgumentException | IOException e) {
-			App.getNotificationPane().setText(e.getMessage());
-			App.getNotificationPane().show();
+			App.setRoot("editorPage");
+		} catch (IllegalArgumentException | IOException | URISyntaxException e) {
+			App.notify(e.getMessage());
 		}
 	}
 
