@@ -27,11 +27,6 @@ public class NewPageController {
 	private TextField passwordField2;
 
 	@FXML
-	private void onSwitchToHomePageAction() throws IOException, URISyntaxException {
-		App.setRoot("homePage");
-	}
-
-	@FXML
 	private void onBrowseForJournalFolderAction() {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		File selectedDirectory = directoryChooser.showDialog(App.getPrimaryStage());
@@ -50,6 +45,11 @@ public class NewPageController {
 		} catch (IllegalArgumentException | IOException | URISyntaxException e) {
 			App.notify(e.getMessage());
 		}
+	}
+
+	@FXML
+	private void onSwitchToHomePageAction() throws IOException, URISyntaxException {
+		App.setRoot("homePage");
 	}
 
 	private void verifyInputs() {

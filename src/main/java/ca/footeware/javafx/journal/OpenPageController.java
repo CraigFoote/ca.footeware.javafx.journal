@@ -21,11 +21,6 @@ public class OpenPageController {
 	private TextField passwordField;
 
 	@FXML
-	private void onSwitchToHomePageAction() throws IOException, URISyntaxException {
-		App.setRoot("homePage");
-	}
-
-	@FXML
 	private void onBrowseForJournalAction() {
 		FileChooser fileChooser = new FileChooser();
 		File theChosenOne = fileChooser.showOpenDialog(App.getPrimaryStage());
@@ -43,6 +38,11 @@ public class OpenPageController {
 		} catch (IllegalArgumentException | IOException | URISyntaxException | JournalException e) {
 			App.notify(e.getMessage());
 		}
+	}
+
+	@FXML
+	private void onSwitchToHomePageAction() throws IOException, URISyntaxException {
+		App.setRoot("homePage");
 	}
 
 	private void verifyInputs() {

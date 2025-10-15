@@ -22,9 +22,38 @@ import javafx.stage.Window;
  */
 public class App extends Application {
 
-	private static Scene scene;
 	private static FXMLLoader loader;
 	private static NotificationPane notificationPane;
+	private static Scene scene;
+
+	static Window getPrimaryStage() {
+		return scene.getWindow();
+	}
+
+	private static Parent loadFXML(String fxml) throws IOException, URISyntaxException {
+		URL resource = App.class.getResource(fxml + ".fxml");
+		loader = new FXMLLoader(resource);
+		return loader.load(new FileInputStream(new File(new URI(resource.toString()))));
+	}
+
+	public static void main(String[] args) {
+		launch();
+	}
+
+	static void notify(String message) {
+		notificationPane.setText(message);
+		notificationPane.show();
+	}
+
+	static void sayHello() {
+		System.err.println("Hello!");
+	}
+
+	static void setRoot(String fxml) throws IOException, URISyntaxException {
+		loadFXML(fxml);
+		Parent page = loader.getRoot();
+		notificationPane.setContent(page);
+	}
 
 	@Override
 	public void start(Stage stage) throws IOException, URISyntaxException {
@@ -36,34 +65,5 @@ public class App extends Application {
 		scene = new Scene(notificationPane, 550, 700);
 		stage.setScene(scene);
 		stage.show();
-	}
-
-	static void setRoot(String fxml) throws IOException, URISyntaxException {
-		loadFXML(fxml);
-		Parent page = loader.getRoot();
-		notificationPane.setContent(page);
-	}
-
-	private static Parent loadFXML(String fxml) throws IOException, URISyntaxException {
-		URL resource = App.class.getResource(fxml + ".fxml");
-		loader = new FXMLLoader(resource);
-		return loader.load(new FileInputStream(new File(new URI(resource.toString()))));
-	}
-
-	static void notify(String message) {
-		notificationPane.setText(message);
-		notificationPane.show();
-	}
-
-	static Window getPrimaryStage() {
-		return scene.getWindow();
-	}
-
-	public static void main(String[] args) {
-		launch();
-	}
-
-	static void sayHello() {
-		System.err.println("Hello!");
 	}
 }

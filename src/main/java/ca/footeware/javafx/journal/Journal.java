@@ -25,9 +25,9 @@ import javax.crypto.NoSuchPaddingException;
  */
 public class Journal {
 
-	private String password;
-	private Map<String, String> map;
 	private File file;
+	private Map<String, String> map;
+	private String password;
 	private Properties properties;
 
 	/**
@@ -74,6 +74,15 @@ public class Journal {
 	}
 
 	/**
+	 * Gets all entries from the journal.
+	 * 
+	 * @return Map<String, String>
+	 */
+	public Map<String, String> getEntries() {
+		return map;
+	}
+
+	/**
 	 * Gets an entry from the journal.
 	 * 
 	 * @param key {@link String}
@@ -94,15 +103,6 @@ public class Journal {
 			return Superstar.decrypt(encrypted, password);
 		}
 		return null;
-	}
-
-	/**
-	 * Gets all entries from the journal.
-	 * 
-	 * @return Map<String, String>
-	 */
-	public Map<String, String> getEntries() {
-		return map;
 	}
 
 	/**

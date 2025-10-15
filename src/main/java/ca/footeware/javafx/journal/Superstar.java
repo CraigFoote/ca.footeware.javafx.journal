@@ -20,20 +20,47 @@ import javax.crypto.spec.SecretKeySpec;
 public class Superstar {
 
 	/**
-	 * Generate a symmetric key for AES encryption using a password and salt.
+	 * Decrypt data using the given password.
 	 * 
-	 * @param password {@link String}
-	 * @param salt     byte array
-	 * @return {@link SecretKey}
+	 * @param encryptedData
+	 * @param password
+	 * @return {@link String}
 	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
 	 * @throws InvalidKeySpecException
 	 */
-	private static SecretKey generateAESKey(String password, byte[] salt)
-			throws NoSuchAlgorithmException, InvalidKeySpecException {
-		PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 10000, 256);
-		SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-		byte[] encodedKey = factory.generateSecret(spec).getEncoded();
-		return new SecretKeySpec(encodedKey, "AES");
+	public static String decrypt(String encryptedData, String password) throws NoSuchAlgorithmException,
+			NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
+			BadPaddingException, InvalidKeySpecException {
+
+		// Decode the Base64 encoded data
+		byte[] combined = Base64.getDecoder().decode(encryptedData);
+
+		// Extract salt (first 16 bytes)
+		byte[] salt = new byte[16];
+		System.arraycopy(combined, 0, salt, 0, 16);
+
+		// Extract IV (next 12 bytes)
+		byte[] ivBytes = new byte[12];
+		System.arraycopy(combined, 16, ivBytes, 0, 12);
+
+		// Extract encrypted data (remaining bytes)
+		byte[] encryptedBytes = new byte[combined.length - 28]; // 16 (salt) + 12 (IV) = 28
+		System.arraycopy(combined, 28, encryptedBytes, 0, encryptedBytes.length);
+
+		// Generate the same key using password and extracted salt
+		SecretKey secretKey = generateAESKey(password, salt);
+
+		Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+		GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128, ivBytes);
+		cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmParameterSpec);
+		byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+
+		return new String(decryptedBytes);
 	}
 
 	/**
@@ -78,47 +105,20 @@ public class Superstar {
 	}
 
 	/**
-	 * Decrypt data using the given password.
+	 * Generate a symmetric key for AES encryption using a password and salt.
 	 * 
-	 * @param encryptedData
-	 * @param password
-	 * @return {@link String}
+	 * @param password {@link String}
+	 * @param salt     byte array
+	 * @return {@link SecretKey}
 	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
-	 * @throws InvalidKeyException
-	 * @throws InvalidAlgorithmParameterException
-	 * @throws IllegalBlockSizeException
-	 * @throws BadPaddingException
 	 * @throws InvalidKeySpecException
 	 */
-	public static String decrypt(String encryptedData, String password) throws NoSuchAlgorithmException,
-			NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
-			BadPaddingException, InvalidKeySpecException {
-
-		// Decode the Base64 encoded data
-		byte[] combined = Base64.getDecoder().decode(encryptedData);
-
-		// Extract salt (first 16 bytes)
-		byte[] salt = new byte[16];
-		System.arraycopy(combined, 0, salt, 0, 16);
-
-		// Extract IV (next 12 bytes)
-		byte[] ivBytes = new byte[12];
-		System.arraycopy(combined, 16, ivBytes, 0, 12);
-
-		// Extract encrypted data (remaining bytes)
-		byte[] encryptedBytes = new byte[combined.length - 28]; // 16 (salt) + 12 (IV) = 28
-		System.arraycopy(combined, 28, encryptedBytes, 0, encryptedBytes.length);
-
-		// Generate the same key using password and extracted salt
-		SecretKey secretKey = generateAESKey(password, salt);
-
-		Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-		GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128, ivBytes);
-		cipher.init(Cipher.DECRYPT_MODE, secretKey, gcmParameterSpec);
-		byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
-
-		return new String(decryptedBytes);
+	private static SecretKey generateAESKey(String password, byte[] salt)
+			throws NoSuchAlgorithmException, InvalidKeySpecException {
+		PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 10000, 256);
+		SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+		byte[] encodedKey = factory.generateSecret(spec).getEncoded();
+		return new SecretKeySpec(encodedKey, "AES");
 	}
 
 	private Superstar() {

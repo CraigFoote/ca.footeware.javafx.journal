@@ -21,7 +21,20 @@ public class JournalManager {
 
 	private static Journal journal;
 
-	private JournalManager() {
+	/**
+	 * Add an entry to the journal.
+	 * 
+	 * @param key   {@link String} a date in the format YYYY-MM-DD.
+	 * @param value {@link String} the text of the entry, to be encrypted
+	 * @throws JournalException
+	 */
+	static void addEntry(String key, String value) throws JournalException {
+		try {
+			journal.addEntry(key, value);
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
+				| BadPaddingException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
+			throw new JournalException("Error adding entry to journal.", e);
+		}
 	}
 
 	/**
@@ -43,6 +56,22 @@ public class JournalManager {
 			throw new IOException("");
 		}
 		journal = new Journal(file, password);
+	}
+
+	/**
+	 * Get a day's journal entry.
+	 * 
+	 * @param formattedDate {@link String} in format yyyy-MM-dd.
+	 * @return {@link String} may be null
+	 * @throws JournalException
+	 */
+	static String getEntry(String formattedDate) throws JournalException {
+		try {
+			return journal.getEntry(String.valueOf(formattedDate));
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
+				| BadPaddingException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
+			throw new JournalException("Error: " + e.getMessage() + ". Was the password correct?", e);
+		}
 	}
 
 	/**
@@ -69,22 +98,6 @@ public class JournalManager {
 	}
 
 	/**
-	 * Add an entry to the journal.
-	 * 
-	 * @param key   {@link String} a date in the format YYYY-MM-DD.
-	 * @param value {@link String} the text of the entry, to be encrypted
-	 * @throws JournalException
-	 */
-	static void addEntry(String key, String value) throws JournalException {
-		try {
-			journal.addEntry(key, value);
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
-				| BadPaddingException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
-			throw new JournalException("Error adding entry to journal.", e);
-		}
-	}
-
-	/**
 	 * Save the journal.
 	 * 
 	 * @throws JournalException
@@ -97,19 +110,6 @@ public class JournalManager {
 		}
 	}
 
-	/**
-	 * Get a day's journal entry.
-	 * 
-	 * @param formattedDate {@link String} in format yyyy-MM-dd.
-	 * @return {@link String} may be null
-	 * @throws JournalException
-	 */
-	static String getEntry(String formattedDate) throws JournalException {
-		try {
-			return journal.getEntry(String.valueOf(formattedDate));
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
-				| BadPaddingException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
-			throw new JournalException("Error: " + e.getMessage() + ". Was the password correct?", e);
-		}
+	private JournalManager() {
 	}
 }

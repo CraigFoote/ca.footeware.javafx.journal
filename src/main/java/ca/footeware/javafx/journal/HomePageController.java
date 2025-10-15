@@ -8,12 +8,12 @@ import javafx.fxml.FXML;
 public class HomePageController {
 
 	@FXML
-	private void onSwitchToOpenPageAction() throws IOException, URISyntaxException {
-		App.setRoot("openPage");
+	private void onSwitchToNewPageAction() throws IOException, URISyntaxException {
+		App.setRoot("newPage");
 	}
 
 	@FXML
-	private void onSwitchToNewPageAction() throws IOException, URISyntaxException {
-		App.setRoot("newPage");
+	private void onSwitchToOpenPageAction() throws IOException, URISyntaxException {
+		App.setRoot("openPage");
 	}
 }

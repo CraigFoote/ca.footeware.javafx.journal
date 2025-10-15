@@ -27,148 +27,32 @@ import javafx.scene.text.FontWeight;
  */
 public class EditorPageController {
 
-	@FXML
-	private Label yearLabel;
+	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
 
-	@FXML
-	private Label monthLabel;
-
-	@FXML
-	private GridPane dateGrid;
-
-	@FXML
-	private TextArea textArea;
+	private int currentDayOfMonth;
 
 	private Label currentSelection;
 
 	private YearMonth currentYearMonth;
 
-	private int currentDayOfMonth;
-
-	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
+	@FXML
+	private GridPane dateGrid;
 
 	@FXML
-	private void onSaveAction() {
-		try {
-			LocalDate date = currentYearMonth.atDay(currentDayOfMonth);
-			String formatted = date.format(dateFormatter);
-			JournalManager.addEntry(formatted, textArea.getText());
-			JournalManager.saveJournal();
-			paintshop();
-			App.notify("Journal was saved.");
-		} catch (JournalException e) {
-			App.notify(e.getMessage());
-		}
-	}
+	private Label monthLabel;
 
 	@FXML
-	private void onPreviousYearAction() {
-		YearMonth yesterYear = YearMonth.of(currentYearMonth.getYear() - 1, currentYearMonth.getMonth());
-		drawMonth(yesterYear);
-	}
+	private TextArea textArea;
 
 	@FXML
-	private void onNextYearAction() {
-		YearMonth nextYear = YearMonth.of(currentYearMonth.getYear() + 1, currentYearMonth.getMonth());
-		drawMonth(nextYear);
-	}
-
-	@FXML
-	private void onPreviousMonthAction() {
-		// if current is Jan. wrap to Dec.
-		Month previousMonthEnum = currentYearMonth.getMonth() == Month.JANUARY ? Month.DECEMBER
-				: Month.of(currentYearMonth.getMonthValue() - 1);
-		YearMonth previousMonth = YearMonth.of(currentYearMonth.getYear(), previousMonthEnum);
-		drawMonth(previousMonth);
-	}
-
-	@FXML
-	private void onNextMonthAction() {
-		// if current is Dec. wrap to Jan.
-		Month nextMonthEnum = currentYearMonth.getMonth() == Month.DECEMBER ? Month.JANUARY
-				: Month.of(currentYearMonth.getMonthValue() + 1);
-		YearMonth nextMonth = YearMonth.of(currentYearMonth.getYear(), nextMonthEnum);
-		drawMonth(nextMonth);
-	}
-
-	@FXML
-	private void onFirstEntryAction() {
-		App.sayHello();
-	}
-
-	@FXML
-	private void onPreviousEntryAction() {
-		App.sayHello();
-	}
-
-	@FXML
-	private void onTodayAction() {
-		drawMonth(YearMonth.now());
-	}
-
-	@FXML
-	private void onNextEntryAction() {
-		App.sayHello();
-	}
-
-	@FXML
-	private void onLastEntryAction() {
-		App.sayHello();
-	}
-
-	@FXML
-	private void initialize() {
-		currentDayOfMonth = LocalDate.now().getDayOfMonth();
-		drawMonth(YearMonth.now());
-		Platform.runLater(() -> textArea.requestFocus());
-	}
-
-	/**
-	 * Draw the calendar to show the provided {@link YearMonth}.
-	 * 
-	 * @param ym {@link YearMonth}
-	 */
-	private void drawMonth(YearMonth ym) {
-		currentYearMonth = ym;
-		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
-		monthLabel.setText(currentYearMonth.getMonth().toString());
-
-		createDateGrid();
-		paintshop();
-	}
-
-	/**
-	 * Set background color of days with entries and, if {@link #currentYearMonth}
-	 * is in current year and month, highlight today.
-	 */
-	private void paintshop() {
-		LocalDate now = LocalDate.now();
-		boolean todayFound = false;
-		boolean selectionBorderized = false;
-		if (now.getYear() == currentYearMonth.getYear() && now.getMonthValue() == currentYearMonth.getMonthValue()) {
-			for (Node node : dateGrid.getChildren()) {
-				if (node instanceof Label label) {
-					// blue background for days with entries
-					colorizeDayWithEntry(label);
-					// find and colorize today's label font red
-					if (!todayFound) {
-						todayFound = colorizeToday(label, now.getDayOfMonth());
-					}
-					// set a border on currently selected day
-					if (!selectionBorderized) {
-						selectionBorderized = borderizeCurrentSelection(label);
-					}
-				}
-			}
-		}
-	}
+	private Label yearLabel;
 
 	/**
 	 * Set a border around the provided label if it represents the currently
 	 * selected day.
 	 * 
 	 * @param label {@link Label}
-	 * @return boolean true if item now has a border
+	 * @return boolean true if label now has a border
 	 */
 	private boolean borderizeCurrentSelection(Label label) {
 		if (currentSelection != null && label.getText().equals(currentSelection.getText())) {
@@ -177,6 +61,17 @@ public class EditorPageController {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Clear all {@link #dateGrid} labels of borders.
+	 */
+	private void clearBorders() {
+		for (Node node : dateGrid.getChildren()) {
+			if (node instanceof Label label) {
+				label.setBorder(null);
+			}
+		}
 	}
 
 	/**
@@ -246,14 +141,32 @@ public class EditorPageController {
 	}
 
 	/**
-	 * Clear all {@link #dateGrid} labels of borders.
+	 * Draw the calendar to show the provided {@link YearMonth}.
+	 * 
+	 * @param ym {@link YearMonth}
 	 */
-	private void clearBorders() {
-		for (Node node : dateGrid.getChildren()) {
-			if (node instanceof Label label) {
-				label.setBorder(null);
-			}
+	private void drawMonth(YearMonth ym) {
+		currentYearMonth = ym;
+		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
+		monthLabel.setText(currentYearMonth.getMonth().toString());
+
+		createDateGrid();
+		paintshop();
+	}
+
+	/**
+	 * Called after injection of widgets.
+	 */
+	@FXML
+	private void initialize() {
+		currentDayOfMonth = LocalDate.now().getDayOfMonth();
+		drawMonth(YearMonth.now());
+		// select today
+		Node node = dateGrid.getChildrenUnmodifiable().get(currentDayOfMonth);
+		if (node instanceof Label label) {
+			onDayLabelClicked(label);
 		}
+		Platform.runLater(() -> textArea.requestFocus());
 	}
 
 	/**
@@ -277,6 +190,101 @@ public class EditorPageController {
 			textArea.positionCaret(text != null ? text.length() : 0);
 		} catch (JournalException e) {
 			App.notify(e.getMessage());
+		}
+	}
+
+	@FXML
+	private void onFirstEntryAction() {
+		App.sayHello();
+	}
+
+	@FXML
+	private void onLastEntryAction() {
+		App.sayHello();
+	}
+
+	@FXML
+	private void onNextEntryAction() {
+		App.sayHello();
+	}
+
+	@FXML
+	private void onNextMonthAction() {
+		// if current is Dec. wrap to Jan.
+		Month nextMonthEnum = currentYearMonth.getMonth() == Month.DECEMBER ? Month.JANUARY
+				: Month.of(currentYearMonth.getMonthValue() + 1);
+		YearMonth nextMonth = YearMonth.of(currentYearMonth.getYear(), nextMonthEnum);
+		drawMonth(nextMonth);
+	}
+
+	@FXML
+	private void onNextYearAction() {
+		YearMonth nextYear = YearMonth.of(currentYearMonth.getYear() + 1, currentYearMonth.getMonth());
+		drawMonth(nextYear);
+	}
+
+	@FXML
+	private void onPreviousEntryAction() {
+		App.sayHello();
+	}
+
+	@FXML
+	private void onPreviousMonthAction() {
+		// if current is Jan. wrap to Dec.
+		Month previousMonthEnum = currentYearMonth.getMonth() == Month.JANUARY ? Month.DECEMBER
+				: Month.of(currentYearMonth.getMonthValue() - 1);
+		YearMonth previousMonth = YearMonth.of(currentYearMonth.getYear(), previousMonthEnum);
+		drawMonth(previousMonth);
+	}
+
+	@FXML
+	private void onPreviousYearAction() {
+		YearMonth yesterYear = YearMonth.of(currentYearMonth.getYear() - 1, currentYearMonth.getMonth());
+		drawMonth(yesterYear);
+	}
+
+	@FXML
+	private void onSaveAction() {
+		try {
+			LocalDate date = currentYearMonth.atDay(currentDayOfMonth);
+			String formatted = date.format(dateFormatter);
+			JournalManager.addEntry(formatted, textArea.getText());
+			JournalManager.saveJournal();
+			paintshop();
+			App.notify("Journal was saved.");
+		} catch (JournalException e) {
+			App.notify(e.getMessage());
+		}
+	}
+
+	@FXML
+	private void onTodayAction() {
+		drawMonth(YearMonth.now());
+	}
+
+	/**
+	 * Set background color of days with entries and, if {@link #currentYearMonth}
+	 * is in current year and month, highlight today.
+	 */
+	private void paintshop() {
+		LocalDate now = LocalDate.now();
+		boolean todayFound = false;
+		boolean selectionBorderized = false;
+		if (now.getYear() == currentYearMonth.getYear() && now.getMonthValue() == currentYearMonth.getMonthValue()) {
+			for (Node node : dateGrid.getChildren()) {
+				if (node instanceof Label label) {
+					// blue background for days with entries
+					colorizeDayWithEntry(label);
+					// find and colorize today's label font red
+					if (!todayFound) {
+						todayFound = colorizeToday(label, now.getDayOfMonth());
+					}
+					// set a border on currently selected day
+					if (!selectionBorderized) {
+						selectionBorderized = borderizeCurrentSelection(label);
+					}
+				}
+			}
 		}
 	}
 }
