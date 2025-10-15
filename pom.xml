@@ -52,6 +52,13 @@
 		</dependency>
     </dependencies>
     
+    <repositories>
+	    <repository>
+	        <id>my-local-repo</id>
+	        <url>file:${basedir}\lib\DateChooser.jar</url>
+	    </repository>
+	</repositories>
+    
     <build>
         <plugins>
             <plugin>
