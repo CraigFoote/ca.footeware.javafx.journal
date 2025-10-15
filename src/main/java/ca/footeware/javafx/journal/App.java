@@ -1,10 +1,15 @@
 package ca.footeware.javafx.journal;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.controlsfx.control.NotificationPane;
 
-import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.NordDark;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,49 +22,48 @@ import javafx.stage.Window;
  */
 public class App extends Application {
 
-    private static Scene scene;
-    private static NotificationPane notificationPane;
+	private static FXMLLoader loader;
+	private static NotificationPane notificationPane;
+	private static Scene scene;
 
-    @Override
-    public void start(Stage stage) throws IOException {
-		Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
-        Parent root = loadFXML("editorPage");
-        notificationPane = new NotificationPane(root);
-        notificationPane.setShowFromTop(false);
-        notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
-        scene = new Scene(notificationPane, 450, 450);
-        stage.setScene(scene);
-        stage.show();
-    }
+	static Window getPrimaryStage() {
+		return scene.getWindow();
+	}
 
-    static void setRoot(String fxml) throws IOException {
-        Parent page = loadFXML(fxml);
-        notificationPane.setContent(page);
-    }
+	private static Parent loadFXML(String fxml) throws IOException, URISyntaxException {
+		URL resource = App.class.getResource(fxml + ".fxml");
+		loader = new FXMLLoader(resource);
+		return loader.load(new FileInputStream(new File(new URI(resource.toString()))));
+	}
 
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        Parent parent = fxmlLoader.load();
-        if (fxml.equals("editorPage")) {
-			EditorPageController controller = fxmlLoader.getController();
-			controller.createCalendar();
-		}
-        return parent;
-    }
+	public static void main(String[] args) {
+		launch();
+	}
 
-    public static NotificationPane getNotificationPane() {
-        return notificationPane;
-    }
+	static void notify(String message) {
+		notificationPane.setText(message);
+		notificationPane.show();
+	}
 
-    public static Window getPrimaryStage() {
-        return scene.getWindow();
-    }
-
-    public static void main(String[] args) {
-        launch();
-    }
-
-	public static void sayHello() {
+	static void sayHello() {
 		System.err.println("Hello!");
+	}
+
+	static void setRoot(String fxml) throws IOException, URISyntaxException {
+		loadFXML(fxml);
+		Parent page = loader.getRoot();
+		notificationPane.setContent(page);
+	}
+
+	@Override
+	public void start(Stage stage) throws IOException, URISyntaxException {
+		Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
+		Parent root = loadFXML("homePage");
+		notificationPane = new NotificationPane(root);
+		notificationPane.setShowFromTop(false);
+		notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
+		scene = new Scene(notificationPane, 550, 700);
+		stage.setScene(scene);
+		stage.show();
 	}
 }

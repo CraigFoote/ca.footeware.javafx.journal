@@ -13,8 +13,8 @@
 
 <GridPane hgap="10.0" prefHeight="171.0" prefWidth="500.0" vgap="10.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.footeware.javafx.journal.OpenPageController">
    <columnConstraints>
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="233.5" minWidth="10.0" prefWidth="124.0" />
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="397.0" minWidth="0.0" prefWidth="326.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="125.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="326.0" />
    </columnConstraints>
    <rowConstraints>
       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" vgrow="SOMETIMES" />
@@ -43,8 +43,8 @@
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin></Label>
-      <Button fx:id="browseButton" mnemonicParsing="false" onAction="#browseForJournal" text="Browse" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-      <PasswordField prefHeight="26.0" prefWidth="299.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+      <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseForJournalAction" text="Browse" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <PasswordField fx:id="passwordField" prefHeight="26.0" prefWidth="299.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
@@ -52,12 +52,12 @@
             <Insets right="20.0" />
          </GridPane.margin>
       </PasswordField>
-      <Button fx:id="openButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#openJournal" text="Open Journal" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+      <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onOpenJournalAction" text="Open Journal" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
          <GridPane.margin>
             <Insets right="20.0" />
          </GridPane.margin>
       </Button>
-      <Button fx:id="backButton" alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#switchToHomePage" prefHeight="40.0" prefWidth="25.0" GridPane.hgrow="NEVER" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+      <Button alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onSwitchToHomePageAction" prefHeight="40.0" prefWidth="25.0" GridPane.hgrow="NEVER" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
          <font>
             <Font size="32.0" />
          </font>

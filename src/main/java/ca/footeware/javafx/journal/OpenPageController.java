@@ -1,9 +1,13 @@
 package ca.footeware.javafx.journal;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.stage.FileChooser;
 
 /**
  * MVC Controller for the "Open" page.
@@ -11,26 +15,42 @@ import javafx.scene.control.Button;
 public class OpenPageController {
 
 	@FXML
-	private Button backButton;
-	
-	@FXML
 	private Button browseButton;
-	
-	@FXML
-	private Button openButton;
 
 	@FXML
-	private void switchToHomePage() throws IOException {
+	private TextField passwordField;
+
+	@FXML
+	private void onBrowseForJournalAction() {
+		FileChooser fileChooser = new FileChooser();
+		File theChosenOne = fileChooser.showOpenDialog(App.getPrimaryStage());
+		if (theChosenOne != null) {
+			browseButton.setText(theChosenOne.getAbsolutePath());
+		}
+	}
+
+	@FXML
+	private void onOpenJournalAction() {
+		try {
+			verifyInputs();
+			JournalManager.openJournal(browseButton.getText(), passwordField.getText());
+			App.setRoot("editorPage");
+		} catch (IllegalArgumentException | IOException | URISyntaxException | JournalException e) {
+			App.notify(e.getMessage());
+		}
+	}
+
+	@FXML
+	private void onSwitchToHomePageAction() throws IOException, URISyntaxException {
 		App.setRoot("homePage");
 	}
 
-	@FXML
-	private void browseForJournal() throws IOException {
-		System.out.println("Browse button clicked");
-	}
-	
-	@FXML
-	private void openJournal() throws IOException {
-		System.out.println("Open button clicked");
+	private void verifyInputs() {
+		if (browseButton.getText().equals("Browse")) {
+			throw new IllegalArgumentException("No location selected");
+		}
+		if (passwordField.getText().isBlank()) {
+			throw new IllegalArgumentException("The password field is blank");
+		}
 	}
 }
