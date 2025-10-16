@@ -1,10 +1,13 @@
-package ca.footeware.javafx.journal;
+package ca.footeware.javafx.journal.controllers;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
+import ca.footeware.javafx.journal.App;
+import ca.footeware.javafx.journal.exceptions.JournalException;
+import ca.footeware.javafx.journal.model.JournalManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -20,6 +23,7 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
 /**
@@ -57,7 +61,7 @@ public class EditorPageController {
 	private boolean borderizeCurrentSelection(Label label) {
 		if (currentSelection != null && label.getText().equals(currentSelection.getText())) {
 			label.setBorder(
-					new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(3))));
+					new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(5))));
 			return true;
 		}
 		return false;
@@ -102,11 +106,11 @@ public class EditorPageController {
 	private boolean colorizeToday(Label label, int todayIndex) {
 		if (label.getText().equals(String.valueOf(todayIndex))) {
 			Font currentFont = label.getFont();
-			label.setFont(Font.font(currentFont.getFamily(), FontWeight.EXTRA_BOLD, currentFont.getSize()));
+			label.setFont(Font.font(currentFont.getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, currentFont.getSize()));
 			label.setTextFill(Color.RED);
 			if (currentSelection != null && currentSelection.getText().equals(String.valueOf(todayIndex))) {
 				label.setBorder(
-						new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(3))));
+						new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(5))));
 			}
 			return true;
 		}
@@ -151,6 +155,7 @@ public class EditorPageController {
 		monthLabel.setText(currentYearMonth.getMonth().toString());
 
 		createDateGrid();
+		clearBorders();
 		paintshop();
 	}
 
@@ -159,7 +164,7 @@ public class EditorPageController {
 	 */
 	@FXML
 	private void initialize() {
-		currentDayOfMonth = LocalDate.now().getDayOfMonth();
+		currentDayOfMonth = LocalDate.now().getDayOfMonth() - 1;
 		drawMonth(YearMonth.now());
 		// select today
 		Node node = dateGrid.getChildrenUnmodifiable().get(currentDayOfMonth);
@@ -175,9 +180,9 @@ public class EditorPageController {
 	 * @param label {@link Label} the clicked day's label
 	 */
 	private void onDayLabelClicked(Label label) {
+		currentSelection = label;
 		clearBorders();
 		paintshop();
-		currentSelection = label;
 		label.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(3))));
 		currentDayOfMonth = Integer.valueOf(label.getText());
 		LocalDate date = currentYearMonth.atDay(currentDayOfMonth);
@@ -260,6 +265,11 @@ public class EditorPageController {
 	@FXML
 	private void onTodayAction() {
 		drawMonth(YearMonth.now());
+		currentDayOfMonth = LocalDate.now().getDayOfMonth();
+		Node node = dateGrid.getChildrenUnmodifiable().get(currentDayOfMonth - 1);
+		if (node instanceof Label label) {
+			onDayLabelClicked(label);
+		}
 	}
 
 	/**
@@ -270,6 +280,7 @@ public class EditorPageController {
 		LocalDate now = LocalDate.now();
 		boolean todayFound = false;
 		boolean selectionBorderized = false;
+		clearBorders();
 		if (now.getYear() == currentYearMonth.getYear() && now.getMonthValue() == currentYearMonth.getMonthValue()) {
 			for (Node node : dateGrid.getChildren()) {
 				if (node instanceof Label label) {

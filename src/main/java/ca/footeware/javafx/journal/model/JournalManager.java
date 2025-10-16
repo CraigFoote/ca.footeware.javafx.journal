@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ca.footeware.javafx.journal;
+package ca.footeware.javafx.journal.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,8 @@ import java.security.spec.InvalidKeySpecException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+
+import ca.footeware.javafx.journal.exceptions.JournalException;
 
 /**
  * 
@@ -28,7 +30,7 @@ public class JournalManager {
 	 * @param value {@link String} the text of the entry, to be encrypted
 	 * @throws JournalException
 	 */
-	static void addEntry(String key, String value) throws JournalException {
+	public static void addEntry(String key, String value) throws JournalException {
 		try {
 			journal.addEntry(key, value);
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
@@ -46,7 +48,7 @@ public class JournalManager {
 	 * @param password {@link String}
 	 * @throws IOException
 	 */
-	static void createNewJournal(String path, String name, String password) throws IOException {
+	public static void createNewJournal(String path, String name, String password) throws IOException {
 		File file = new File(path + File.separator + name);
 		if (file.exists()) {
 			throw new IOException("File already exists: " + file.getAbsolutePath());
@@ -65,7 +67,7 @@ public class JournalManager {
 	 * @return {@link String} may be null
 	 * @throws JournalException
 	 */
-	static String getEntry(String formattedDate) throws JournalException {
+	public static String getEntry(String formattedDate) throws JournalException {
 		try {
 			return journal.getEntry(String.valueOf(formattedDate));
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
@@ -83,7 +85,7 @@ public class JournalManager {
 	 * @throws IOException      if the file is not found
 	 * @throws JournalException if the password is incorrect
 	 */
-	static void openJournal(String path, String password) throws IOException, JournalException {
+	public static void openJournal(String path, String password) throws IOException, JournalException {
 		File file = new File(path);
 		if (!file.exists()) {
 			throw new IOException("File not found: " + file.getAbsolutePath());
@@ -102,7 +104,7 @@ public class JournalManager {
 	 * 
 	 * @throws JournalException
 	 */
-	static void saveJournal() throws JournalException {
+	public static void saveJournal() throws JournalException {
 		try {
 			journal.save();
 		} catch (IOException e) {

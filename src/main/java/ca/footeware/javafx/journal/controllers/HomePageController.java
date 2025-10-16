@@ -1,8 +1,9 @@
-package ca.footeware.javafx.journal;
+package ca.footeware.javafx.journal.controllers;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import ca.footeware.javafx.journal.App;
 import javafx.fxml.FXML;
 
 public class HomePageController {

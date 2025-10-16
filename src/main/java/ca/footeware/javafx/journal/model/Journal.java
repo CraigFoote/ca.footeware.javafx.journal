@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ca.footeware.javafx.journal;
+package ca.footeware.javafx.journal.model;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package ca.footeware.javafx.journal;
+package ca.footeware.javafx.journal.model;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;

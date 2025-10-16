@@ -14,6 +14,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -26,7 +27,7 @@ public class App extends Application {
 	private static NotificationPane notificationPane;
 	private static Scene scene;
 
-	static Window getPrimaryStage() {
+	public static Window getPrimaryStage() {
 		return scene.getWindow();
 	}
 
@@ -40,16 +41,16 @@ public class App extends Application {
 		launch();
 	}
 
-	static void notify(String message) {
+	public static void notify(String message) {
 		notificationPane.setText(message);
 		notificationPane.show();
 	}
 
-	static void sayHello() {
+	public static void sayHello() {
 		System.err.println("Hello!");
 	}
 
-	static void setRoot(String fxml) throws IOException, URISyntaxException {
+	public static void setRoot(String fxml) throws IOException, URISyntaxException {
 		loadFXML(fxml);
 		Parent page = loader.getRoot();
 		notificationPane.setContent(page);
@@ -63,6 +64,9 @@ public class App extends Application {
 		notificationPane.setShowFromTop(false);
 		notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
 		scene = new Scene(notificationPane, 550, 700);
+		Image icon = new Image(getClass().getResourceAsStream("/journal.png"));
+		stage.getIcons().add(icon);
+		stage.setTitle("Journal");
 		stage.setScene(scene);
 		stage.show();
 	}

@@ -1,9 +1,12 @@
-package ca.footeware.javafx.journal;
+package ca.footeware.javafx.journal.controllers;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import ca.footeware.javafx.journal.App;
+import ca.footeware.javafx.journal.exceptions.JournalException;
+import ca.footeware.javafx.journal.model.JournalManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -35,7 +38,7 @@ public class OpenPageController {
 			verifyInputs();
 			JournalManager.openJournal(browseButton.getText(), passwordField.getText());
 			App.setRoot("editorPage");
-		} catch (IllegalArgumentException | IOException | URISyntaxException | JournalException e) {
+		} catch (IOException | JournalException | URISyntaxException e) {
 			App.notify(e.getMessage());
 		}
 	}
