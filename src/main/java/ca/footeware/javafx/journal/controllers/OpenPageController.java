@@ -37,15 +37,16 @@ public class OpenPageController {
 		try {
 			verifyInputs();
 			JournalManager.openJournal(browseButton.getText(), passwordField.getText());
-			App.setRoot("editorPage");
+			App.setRoot("/editorPage");
 		} catch (IOException | JournalException | URISyntaxException e) {
 			App.notify(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
 	@FXML
 	private void onSwitchToHomePageAction() throws IOException, URISyntaxException {
-		App.setRoot("homePage");
+		App.setRoot("/homePage");
 	}
 
 	private void verifyInputs() {

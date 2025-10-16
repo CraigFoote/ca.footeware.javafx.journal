@@ -9,6 +9,9 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -113,5 +116,14 @@ public class JournalManager {
 	}
 
 	private JournalManager() {
+	}
+
+	public static List<String> getEntryDates() {
+		List<String> keys = new ArrayList<>();
+		Map<String, String> entries = journal.getEntries();
+		for (String key : entries.keySet()) {
+			keys.add(key);
+		}
+		return keys;
 	}
 }

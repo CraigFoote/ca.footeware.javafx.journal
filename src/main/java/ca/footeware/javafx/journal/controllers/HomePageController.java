@@ -10,11 +10,11 @@ public class HomePageController {
 
 	@FXML
 	private void onSwitchToNewPageAction() throws IOException, URISyntaxException {
-		App.setRoot("newPage");
+		App.setRoot("/newPage");
 	}
 
 	@FXML
 	private void onSwitchToOpenPageAction() throws IOException, URISyntaxException {
-		App.setRoot("openPage");
+		App.setRoot("/openPage");
 	}
 }

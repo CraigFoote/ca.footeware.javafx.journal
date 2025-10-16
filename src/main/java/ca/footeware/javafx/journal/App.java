@@ -1,9 +1,6 @@
 package ca.footeware.javafx.journal;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -19,7 +16,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 /**
- * JavaFX App
+ * 
  */
 public class App extends Application {
 
@@ -31,10 +28,10 @@ public class App extends Application {
 		return scene.getWindow();
 	}
 
-	private static Parent loadFXML(String fxml) throws IOException, URISyntaxException {
+	public static Parent loadFXML(String fxml) throws IOException, URISyntaxException {
 		URL resource = App.class.getResource(fxml + ".fxml");
 		loader = new FXMLLoader(resource);
-		return loader.load(new FileInputStream(new File(new URI(resource.toString()))));
+		return loader.load();
 	}
 
 	public static void main(String[] args) {
@@ -59,7 +56,7 @@ public class App extends Application {
 	@Override
 	public void start(Stage stage) throws IOException, URISyntaxException {
 		Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
-		Parent root = loadFXML("homePage");
+		Parent root = loadFXML("/homePage");
 		notificationPane = new NotificationPane(root);
 		notificationPane.setShowFromTop(false);
 		notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
