@@ -2,7 +2,6 @@ package ca.footeware.javafx.journal.controllers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.YearMonth;
 
 import ca.footeware.javafx.journal.App;
 import javafx.fxml.FXML;
@@ -18,7 +17,7 @@ public class EditorPageController {
 
 	@FXML
 	private TextArea textArea;
-	
+
 	@FXML
 	private HBox calendarWrapper;
 
@@ -28,17 +27,18 @@ public class EditorPageController {
 	@FXML
 	private void initialize() {
 		URL resource = getClass().getResource("/calendar.fxml");
-		FXMLLoader loader = new FXMLLoader(resource);
 		Node calendar;
 		try {
+			FXMLLoader loader = new FXMLLoader(resource);
 			calendar = loader.load();
-			calendarWrapper.getChildren().add(calendar);
+			Object object = loader.getController();
+			if (object instanceof CalendarController controller) {
+				calendarWrapper.getChildren().add(calendar);
+				textArea.textProperty().bind(controller.getSelectedEntry());
+			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			App.notify(e.getMessage());
 		}
-		
-		textArea.textProperty().bind(CalendarController.selectedEntry);
 	}
 
 	@FXML
@@ -48,13 +48,13 @@ public class EditorPageController {
 //			String formatted = date.format(dateFormatter);
 //			JournalManager.addEntry(formatted, textArea.getText());
 //			JournalManager.saveJournal();
-////			paintshop();
+		////			paintshop();
 //			App.notify("Journal was saved.");
 //		} catch (JournalException e) {
 //			App.notify(e.getMessage());
 //		}
 	}
-	
+
 	@FXML
 	private void onFirstEntryAction() {
 		App.sayHello();
@@ -69,7 +69,7 @@ public class EditorPageController {
 	private void onNextEntryAction() {
 		App.sayHello();
 	}
-	
+
 	@FXML
 	private void onPreviousEntryAction() {
 		App.sayHello();

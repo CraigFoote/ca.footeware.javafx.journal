@@ -37,7 +37,7 @@ public class CalendarController extends VBox {
 	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
 	private Label currentSelection;
 	private YearMonth currentYearMonth;
-	public static StringProperty selectedEntry;
+	private StringProperty selectedEntry;
 
 	@FXML
 	private Label yearLabel;
@@ -60,6 +60,9 @@ public class CalendarController extends VBox {
 		colorizeToday();
 		colorizeEntryDays();
 
+		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
+		monthLabel.setText(currentYearMonth.getMonth().toString());
+
 		// select today by default
 		LocalDate now = LocalDate.now();
 		for (Node node : dateGrid.getChildren()) {
@@ -70,7 +73,10 @@ public class CalendarController extends VBox {
 				break;
 			}
 		}
-
+	}
+	
+	public StringProperty getSelectedEntry() {
+		return selectedEntry;
 	}
 
 	private void setBorder(Label label) {
@@ -165,9 +171,11 @@ public class CalendarController extends VBox {
 	 * Colorize today's date in the calendar.
 	 */
 	private void colorizeToday() {
-		int todayIndex = LocalDateTime.now().getDayOfMonth();
+		LocalDateTime now = LocalDateTime.now();
 		for (Node node : dateGrid.getChildren()) {
-			if (node instanceof Label label && label.getText().equals(String.valueOf(todayIndex))) {
+			// if it's this year and month and label matches today's date
+			if (currentYearMonth.getYear() == now.getYear() && currentYearMonth.getMonth() == now.getMonth()
+					&& node instanceof Label label && label.getText().equals(String.valueOf(now.getDayOfMonth()))) {
 				Font currentFont = label.getFont();
 				label.setFont(Font.font(currentFont.getFamily(), FontWeight.NORMAL, FontPosture.REGULAR,
 						currentFont.getSize()));
@@ -188,7 +196,10 @@ public class CalendarController extends VBox {
 		monthLabel.setText(currentYearMonth.getMonth().toString());
 
 		createDateGrid();
-		clearBorders();
+		colorizeToday();
+		colorizeEntryDays();
+		
+		selectedEntry.setValue("");
 	}
 
 	/**
