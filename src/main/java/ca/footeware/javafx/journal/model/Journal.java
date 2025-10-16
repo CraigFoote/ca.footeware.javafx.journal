@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package ca.footeware.javafx.journal.model;
 
@@ -21,7 +21,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 /**
- * 
+ *
  */
 public class Journal {
 
@@ -32,7 +32,7 @@ public class Journal {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param file     {@link File}
 	 * @param password {@link String}
 	 * @throws IOException if the journal cannot be loaded
@@ -55,7 +55,7 @@ public class Journal {
 
 	/**
 	 * Adds an entry to the journal.
-	 * 
+	 *
 	 * @param key   {@link String} a date in the format yyyy-mm-dd
 	 * @param value {@link String} to be encrypted
 	 * @throws InvalidKeyException
@@ -75,7 +75,7 @@ public class Journal {
 
 	/**
 	 * Gets all entries from the journal.
-	 * 
+	 *
 	 * @return Map<String, String>
 	 */
 	public Map<String, String> getEntries() {
@@ -84,7 +84,7 @@ public class Journal {
 
 	/**
 	 * Gets an entry from the journal.
-	 * 
+	 *
 	 * @param key {@link String}
 	 * @return {@link String} may be null if there's no entry for the provided date
 	 * @throws InvalidKeyException
@@ -107,7 +107,7 @@ public class Journal {
 
 	/**
 	 * Saves the journal to disk.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	public void save() throws IOException {
@@ -119,7 +119,7 @@ public class Journal {
 
 	/**
 	 * Checks the password can decrypt an entry.
-	 * 
+	 *
 	 * @return boolean true if password worked
 	 */
 	public boolean testPassword() {

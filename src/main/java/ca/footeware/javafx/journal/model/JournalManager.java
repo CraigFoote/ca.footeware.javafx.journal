@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package ca.footeware.javafx.journal.model;
 
@@ -20,7 +20,7 @@ import javax.crypto.NoSuchPaddingException;
 import ca.footeware.javafx.journal.exceptions.JournalException;
 
 /**
- * 
+ *
  */
 public class JournalManager {
 
@@ -28,7 +28,7 @@ public class JournalManager {
 
 	/**
 	 * Add an entry to the journal.
-	 * 
+	 *
 	 * @param key   {@link String} a date in the format YYYY-MM-DD.
 	 * @param value {@link String} the text of the entry, to be encrypted
 	 * @throws JournalException
@@ -45,7 +45,7 @@ public class JournalManager {
 	/**
 	 * Creates a new journal at the specified path with the specified name and
 	 * password.
-	 * 
+	 *
 	 * @param path     {@link String}
 	 * @param name     {@link String}
 	 * @param password {@link String}
@@ -65,7 +65,7 @@ public class JournalManager {
 
 	/**
 	 * Get a day's journal entry.
-	 * 
+	 *
 	 * @param formattedDate {@link String} in format yyyy-MM-dd.
 	 * @return {@link String} may be null
 	 * @throws JournalException
@@ -82,7 +82,7 @@ public class JournalManager {
 	/**
 	 * Opens an existing journal of the specified file path and using the provided
 	 * password.
-	 * 
+	 *
 	 * @param path     {@link String}
 	 * @param password {@link String}
 	 * @throws IOException      if the file is not found
@@ -104,7 +104,7 @@ public class JournalManager {
 
 	/**
 	 * Save the journal.
-	 * 
+	 *
 	 * @throws JournalException
 	 */
 	public static void saveJournal() throws JournalException {

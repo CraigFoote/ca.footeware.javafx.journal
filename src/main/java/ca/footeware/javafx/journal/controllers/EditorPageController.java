@@ -2,6 +2,8 @@ package ca.footeware.javafx.journal.controllers;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.YearMonth;
 
 import ca.footeware.javafx.journal.App;
 import javafx.fxml.FXML;
@@ -21,6 +23,8 @@ public class EditorPageController {
 	@FXML
 	private HBox calendarWrapper;
 
+	private CalendarController controller;
+
 	/**
 	 * Called after injection of widgets.
 	 */
@@ -32,7 +36,8 @@ public class EditorPageController {
 			FXMLLoader loader = new FXMLLoader(resource);
 			calendar = loader.load();
 			Object object = loader.getController();
-			if (object instanceof CalendarController controller) {
+			if (object instanceof CalendarController) {
+				controller = (CalendarController) object;
 				calendarWrapper.getChildren().add(calendar);
 				textArea.textProperty().bind(controller.getSelectedEntry());
 			}
@@ -77,11 +82,8 @@ public class EditorPageController {
 
 	@FXML
 	private void onTodayAction() {
-//		drawMonth(YearMonth.now());
-//		currentDayOfMonth = LocalDate.now().getDayOfMonth();
-//		Node node = dateGrid.getChildrenUnmodifiable().get(currentDayOfMonth - 1);
-//		if (node instanceof Label label) {
-//			onDayLabelClicked(label);
-//		}
+		controller.drawMonth(YearMonth.now());
+		int today = LocalDate.now().getDayOfMonth() - 1;
+		controller.selectDayOfMonth(today);
 	}
 }

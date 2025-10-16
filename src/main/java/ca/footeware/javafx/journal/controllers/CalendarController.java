@@ -30,28 +30,133 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 
 /**
- * 
+ *
  */
 public class CalendarController extends VBox {
 
 	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
 	private Label currentSelection;
 	private YearMonth currentYearMonth;
+
+	@FXML
+	private GridPane dateGrid;
+
+	@FXML
+	private Label monthLabel;
+
 	private StringProperty selectedEntry;
 
 	@FXML
 	private Label yearLabel;
 
-	@FXML
-	private Label monthLabel;
-
-	@FXML
-	private GridPane dateGrid;
-
+	/**
+	 * Constructor.
+	 */
 	public CalendarController() {
 		super();
 		currentYearMonth = YearMonth.now();
 		setSpacing(10);
+	}
+
+	/**
+	 * Clear all {@link #dateGrid} labels of borders.
+	 */
+	private void clearBorders() {
+		for (Node node : dateGrid.getChildren()) {
+			if (node instanceof Label label) {
+				label.setBorder(null);
+			}
+		}
+	}
+
+	/**
+	 * Colorize days that have journal entries in the calendar.
+	 */
+	private void colorizeEntryDays() {
+		LocalDate now = LocalDate.now();
+		List<String> entryDates = JournalManager.getEntryDates();
+		for (String entryDate : entryDates) {
+			if (now.getYear() == currentYearMonth.getYear() && now.getMonth() == currentYearMonth.getMonth()) {
+				String dayNum = entryDate.substring(entryDate.lastIndexOf("-") + 1);
+				inner: for (Node node : dateGrid.getChildren()) {
+					if (node instanceof Label label && label.getText().equals(dayNum)) {
+						label.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, null, null)));
+						break inner;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Colorize today's date in the calendar.
+	 */
+	private void colorizeToday() {
+		LocalDateTime now = LocalDateTime.now();
+		for (Node node : dateGrid.getChildren()) {
+			// if it's this year and month and label matches today's date
+			if (currentYearMonth.getYear() == now.getYear() && currentYearMonth.getMonth() == now.getMonth()
+					&& node instanceof Label label && label.getText().equals(String.valueOf(now.getDayOfMonth()))) {
+				Font currentFont = label.getFont();
+				label.setFont(Font.font(currentFont.getFamily(), FontWeight.NORMAL, FontPosture.REGULAR,
+						currentFont.getSize()));
+				label.setTextFill(Color.RED);
+				return;
+			}
+		}
+	}
+
+	/**
+	 * Create this month's calendar days in the {@link #dateGrid}.
+	 */
+	private void createDateGrid() {
+		dateGrid.getChildren().clear();
+
+		int lengthOfMonth = currentYearMonth.lengthOfMonth();
+
+		// find the column index of the 1st day with Sunday=0
+		LocalDate firstOfMonth = currentYearMonth.atDay(1);
+		int firstColumn = firstOfMonth.getDayOfWeek().getValue() % 7;
+
+		for (int day = 1; day <= lengthOfMonth; day++) {
+			int index = firstColumn + (day - 1);
+			int row = index / 7;
+			int col = index % 7;
+
+			final Label dayLabel = new Label(Integer.toString(day));
+			GridPane.setHalignment(dayLabel, HPos.CENTER);
+
+			dayLabel.setOnMouseClicked(_ -> onDayLabelClicked(dayLabel));
+			dayLabel.setCursor(javafx.scene.Cursor.HAND);
+
+			dateGrid.add(dayLabel, col, row);
+		}
+	}
+
+	/**
+	 * Draw the calendar to show the provided {@link YearMonth}.
+	 *
+	 * @param ym {@link YearMonth}
+	 */
+	void drawMonth(YearMonth ym) {
+		currentYearMonth = ym;
+		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
+		monthLabel.setText(currentYearMonth.getMonth().toString());
+
+		createDateGrid();
+		colorizeToday();
+		colorizeEntryDays();
+
+		selectedEntry.setValue("");
+	}
+	
+	/**
+	 * Get the currently selected day's entry.
+	 *
+	 * @return {@link StringProperty} the selected day's entry
+	 */
+	public StringProperty getSelectedEntry() {
+		return selectedEntry;
 	}
 
 	@FXML
@@ -74,28 +179,23 @@ public class CalendarController extends VBox {
 			}
 		}
 	}
-	
-	public StringProperty getSelectedEntry() {
-		return selectedEntry;
-	}
 
-	private void setBorder(Label label) {
-		label.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(5))));
-	}
-
-	private void colorizeEntryDays() {
-		LocalDate now = LocalDate.now();
-		List<String> entryDates = JournalManager.getEntryDates();
-		for (String entryDate : entryDates) {
-			if (now.getYear() == currentYearMonth.getYear() && now.getMonth() == currentYearMonth.getMonth()) {
-				String dayNum = entryDate.substring(entryDate.lastIndexOf("-") + 1);
-				for (Node node : dateGrid.getChildren()) {
-					if (node instanceof Label label && label.getText().equals(dayNum)) {
-						label.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, null, null)));
-						break;
-					}
-				}
-			}
+	/**
+	 * Respond to a mouse-click on an individual day.
+	 *
+	 * @param label {@link Label} the clicked day's label
+	 */
+	void onDayLabelClicked(Label label) {
+		currentSelection = label;
+		clearBorders();
+		setBorder(label);
+		LocalDate selectedDate = currentYearMonth.atDay(Integer.parseInt(currentSelection.getText()));
+		String formatted = selectedDate.format(dateFormatter);
+		try {
+			String entry = JournalManager.getEntry(formatted);
+			selectedEntry.setValue(entry != null ? entry : "");
+		} catch (JournalException e) {
+			App.notify(e.getMessage());
 		}
 	}
 
@@ -130,94 +230,23 @@ public class CalendarController extends VBox {
 	}
 
 	/**
-	 * Create this month's calendar days in the {@link #dateGrid}.
+	 * Set a green border around the provided label.
+	 *
+	 * @param label {@link Label}
 	 */
-	private void createDateGrid() {
-		dateGrid.getChildren().clear();
-
-		int lengthOfMonth = currentYearMonth.lengthOfMonth();
-
-		// find the column index of the 1st day with Sunday=0
-		LocalDate firstOfMonth = currentYearMonth.atDay(1);
-		int firstColumn = firstOfMonth.getDayOfWeek().getValue() % 7;
-
-		for (int day = 1; day <= lengthOfMonth; day++) {
-			int index = firstColumn + (day - 1);
-			int row = index / 7;
-			int col = index % 7;
-
-			final Label dayLabel = new Label(Integer.toString(day));
-			GridPane.setHalignment(dayLabel, HPos.CENTER);
-
-			dayLabel.setOnMouseClicked(_ -> onDayLabelClicked(dayLabel));
-			dayLabel.setCursor(javafx.scene.Cursor.HAND);
-
-			dateGrid.add(dayLabel, col, row);
-		}
+	private void setBorder(Label label) {
+		label.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(5))));
 	}
-
+	
 	/**
-	 * Clear all {@link #dateGrid} labels of borders.
+	 * Select a day of the month programmatically.
+	 *
+	 * @param today int the day of the month to select
 	 */
-	private void clearBorders() {
-		for (Node node : dateGrid.getChildren()) {
-			if (node instanceof Label label) {
-				label.setBorder(null);
-			}
-		}
-	}
-
-	/**
-	 * Colorize today's date in the calendar.
-	 */
-	private void colorizeToday() {
-		LocalDateTime now = LocalDateTime.now();
-		for (Node node : dateGrid.getChildren()) {
-			// if it's this year and month and label matches today's date
-			if (currentYearMonth.getYear() == now.getYear() && currentYearMonth.getMonth() == now.getMonth()
-					&& node instanceof Label label && label.getText().equals(String.valueOf(now.getDayOfMonth()))) {
-				Font currentFont = label.getFont();
-				label.setFont(Font.font(currentFont.getFamily(), FontWeight.NORMAL, FontPosture.REGULAR,
-						currentFont.getSize()));
-				label.setTextFill(Color.RED);
-				return;
-			}
-		}
-	}
-
-	/**
-	 * Draw the calendar to show the provided {@link YearMonth}.
-	 * 
-	 * @param ym {@link YearMonth}
-	 */
-	private void drawMonth(YearMonth ym) {
-		currentYearMonth = ym;
-		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
-		monthLabel.setText(currentYearMonth.getMonth().toString());
-
-		createDateGrid();
-		colorizeToday();
-		colorizeEntryDays();
-		
-		selectedEntry.setValue("");
-	}
-
-	/**
-	 * Respond to a mouse-click on an individual day.
-	 * 
-	 * @param label {@link Label} the clicked day's label
-	 */
-	private void onDayLabelClicked(Label label) {
-		currentSelection = label;
-		clearBorders();
-		setBorder(label);
-		LocalDate selectedDate = currentYearMonth.atDay(Integer.parseInt(currentSelection.getText()));
-		String formatted = selectedDate.format(dateFormatter);
-		try {
-			String entry = JournalManager.getEntry(formatted);
-			selectedEntry.setValue(entry != null ? entry : "");
-		} catch (JournalException e) {
-			App.notify(e.getMessage());
+	public void selectDayOfMonth(int day) {
+		Node node = dateGrid.getChildrenUnmodifiable().get(day);
+		if (node instanceof Label label) {
+			onDayLabelClicked(label);
 		}
 	}
 }

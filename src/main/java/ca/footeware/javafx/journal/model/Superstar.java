@@ -21,7 +21,7 @@ public class Superstar {
 
 	/**
 	 * Decrypt data using the given password.
-	 * 
+	 *
 	 * @param encryptedData
 	 * @param password
 	 * @return {@link String}
@@ -65,7 +65,7 @@ public class Superstar {
 
 	/**
 	 * Encrypt data using the given password.
-	 * 
+	 *
 	 * @param data     {@link String}
 	 * @param password {@link String}
 	 * @return {@link String}
@@ -106,7 +106,7 @@ public class Superstar {
 
 	/**
 	 * Generate a symmetric key for AES encryption using a password and salt.
-	 * 
+	 *
 	 * @param password {@link String}
 	 * @param salt     byte array
 	 * @return {@link SecretKey}

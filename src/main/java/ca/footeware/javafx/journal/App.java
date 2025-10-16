@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 /**
- * 
+ *
  */
 public class App extends Application {
 
