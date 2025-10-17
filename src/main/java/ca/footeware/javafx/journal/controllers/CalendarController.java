@@ -76,13 +76,13 @@ public class CalendarController extends VBox {
 		LocalDate now = LocalDate.now();
 		List<String> entryDates = JournalManager.getEntryDates();
 		for (String entryDate : entryDates) {
+			// if displaying this year and month, find the today label and colorize it
 			if (now.getYear() == currentYearMonth.getYear() && now.getMonth() == currentYearMonth.getMonth()) {
-				String dayNum = entryDate.substring(entryDate.lastIndexOf("-") + 1);
-				inner: for (Node node : dateGrid.getChildren()) {
-					if (node instanceof Label label && label.getText().equals(dayNum)) {
-						label.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, null, null)));
-						break inner;
-					}
+				String dayNumStr = entryDate.substring(entryDate.lastIndexOf("-") + 1);
+				int dayNum = Integer.parseInt(dayNumStr) - 1; // days are 1-based
+				Node node = dateGrid.getChildren().get(dayNum);
+				if (node instanceof Label label && label.getText().equals(dayNumStr)) {
+					label.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, null, null)));
 				}
 			}
 		}
@@ -149,7 +149,7 @@ public class CalendarController extends VBox {
 
 		selectedEntry.setValue("");
 	}
-	
+
 	/**
 	 * Get the currently selected day's entry.
 	 *
@@ -171,10 +171,16 @@ public class CalendarController extends VBox {
 		// select today by default
 		LocalDate now = LocalDate.now();
 		for (Node node : dateGrid.getChildren()) {
-			if (node instanceof Label label && label.getText().equals(String.valueOf(now.getDayOfMonth()))) {
+			String today = String.valueOf(now.getDayOfMonth());
+			if (node instanceof Label label && label.getText().equals(today)) {
 				setBorder(label);
 				currentSelection = label;
-				selectedEntry = new SimpleStringProperty(label.getText());
+				try {
+					selectedEntry = new SimpleStringProperty(JournalManager.getEntry(today));
+				} catch (JournalException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				break;
 			}
 		}
@@ -237,7 +243,7 @@ public class CalendarController extends VBox {
 	private void setBorder(Label label) {
 		label.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(5))));
 	}
-	
+
 	/**
 	 * Select a day of the month programmatically.
 	 *

@@ -43,7 +43,7 @@ public class NewPageController {
 			verifyInputs();
 			JournalManager.createNewJournal(browseButton.getText(), nameField.getText().trim(),
 					passwordField1.getText());
-			App.setRoot("editorPage");
+			App.setRoot("/editorPage");
 		} catch (IllegalArgumentException | IOException | URISyntaxException e) {
 			App.notify(e.getMessage());
 		}
@@ -51,7 +51,7 @@ public class NewPageController {
 
 	@FXML
 	private void onSwitchToHomePageAction() throws IOException, URISyntaxException {
-		App.setRoot("homePage");
+		App.setRoot("/homePage");
 	}
 
 	private void verifyInputs() {

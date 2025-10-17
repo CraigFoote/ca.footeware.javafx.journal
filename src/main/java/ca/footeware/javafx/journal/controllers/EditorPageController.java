@@ -36,10 +36,10 @@ public class EditorPageController {
 			FXMLLoader loader = new FXMLLoader(resource);
 			calendar = loader.load();
 			Object object = loader.getController();
-			if (object instanceof CalendarController) {
-				controller = (CalendarController) object;
+			if (object instanceof CalendarController calendarController) {
+				controller = calendarController;
 				calendarWrapper.getChildren().add(calendar);
-				textArea.textProperty().bind(controller.getSelectedEntry());
+				textArea.textProperty().bindBidirectional(controller.getSelectedEntry());
 			}
 		} catch (IOException e) {
 			App.notify(e.getMessage());
