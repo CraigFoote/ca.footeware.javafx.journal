@@ -34,7 +34,7 @@ import javafx.scene.text.FontWeight;
  */
 public class CalendarController extends VBox {
 
-	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
+	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
 	private Label currentSelection;
 	private YearMonth currentYearMonth;
 
@@ -72,7 +72,8 @@ public class CalendarController extends VBox {
 	/**
 	 * Colorize days that have journal entries in the calendar.
 	 */
-	private void colorizeEntryDays() {
+	public void colorizeEntryDays() {
+		clearBackgrounds();
 		LocalDate now = LocalDate.now();
 		List<String> entryDates = JournalManager.getEntryDates();
 		for (String entryDate : entryDates) {
@@ -86,6 +87,17 @@ public class CalendarController extends VBox {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Clear the calendar days' background colors.
+	 */
+	private void clearBackgrounds() {
+		dateGrid.getChildren().forEach((node) -> {
+			if (node instanceof Label label) {
+				label.setBackground(null);
+			}
+		});
 	}
 
 	/**
@@ -178,8 +190,7 @@ public class CalendarController extends VBox {
 				try {
 					selectedEntry = new SimpleStringProperty(JournalManager.getEntry(today));
 				} catch (JournalException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					App.notify(e.getMessage());
 				}
 				break;
 			}
@@ -254,5 +265,15 @@ public class CalendarController extends VBox {
 		if (node instanceof Label label) {
 			onDayLabelClicked(label);
 		}
+	}
+
+	/**
+	 * Gets the currently selected date.
+	 * 
+	 * @return {@link LocalDate}
+	 */
+	public LocalDate getSelectedDate() {
+		return LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
+				Integer.parseInt(currentSelection.getText()));
 	}
 }

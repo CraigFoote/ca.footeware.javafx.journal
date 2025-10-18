@@ -50,7 +50,7 @@ public class Journal {
 		 * object. The Properties file, this.properties, is the persistence vector. Copy
 		 * its entries to the map.
 		 */
-		this.properties.entrySet().forEach((entry) -> map.put((String) entry.getKey(), (String) entry.getValue()));
+		this.properties.entrySet().forEach(entry -> map.put((String) entry.getKey(), (String) entry.getValue()));
 	}
 
 	/**
@@ -69,8 +69,12 @@ public class Journal {
 	public void addEntry(String key, String value)
 			throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException,
 			BadPaddingException, InvalidAlgorithmParameterException, InvalidKeySpecException {
-		String encrypted = Superstar.encrypt(value, password);
-		map.put(key, encrypted);
+		if (value.isBlank()) {
+			map.remove(key);
+		} else {
+			String encrypted = Superstar.encrypt(value, password);
+			map.put(key, encrypted);
+		}
 	}
 
 	/**
@@ -111,6 +115,7 @@ public class Journal {
 	 * @throws IOException
 	 */
 	public void save() throws IOException {
+		properties.clear();
 		map.forEach((k, v) -> properties.put(k, v));
 		try (var out = new FileOutputStream(file)) {
 			properties.store(out, null);
@@ -129,7 +134,7 @@ public class Journal {
 				Superstar.decrypt(entry.getValue(), password);
 			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
 					| InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException
-					| InvalidKeySpecException e) {
+					| InvalidKeySpecException _) {
 				return false;
 			}
 		}

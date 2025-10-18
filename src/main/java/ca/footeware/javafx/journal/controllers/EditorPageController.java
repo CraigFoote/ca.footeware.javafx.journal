@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 
 import ca.footeware.javafx.journal.App;
+import ca.footeware.javafx.journal.exceptions.JournalException;
+import ca.footeware.javafx.journal.model.JournalManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -23,7 +25,7 @@ public class EditorPageController {
 	@FXML
 	private HBox calendarWrapper;
 
-	private CalendarController controller;
+	private CalendarController calendarController;
 
 	/**
 	 * Called after injection of widgets.
@@ -36,10 +38,10 @@ public class EditorPageController {
 			FXMLLoader loader = new FXMLLoader(resource);
 			calendar = loader.load();
 			Object object = loader.getController();
-			if (object instanceof CalendarController calendarController) {
-				controller = calendarController;
+			if (object instanceof CalendarController cController) {
+				calendarController = cController;
 				calendarWrapper.getChildren().add(calendar);
-				textArea.textProperty().bindBidirectional(controller.getSelectedEntry());
+				textArea.textProperty().bindBidirectional(calendarController.getSelectedEntry());
 			}
 		} catch (IOException e) {
 			App.notify(e.getMessage());
@@ -48,16 +50,16 @@ public class EditorPageController {
 
 	@FXML
 	private void onSaveAction() {
-//		try {
-//			LocalDate date = currentYearMonth.atDay(currentDayOfMonth);
-//			String formatted = date.format(dateFormatter);
-//			JournalManager.addEntry(formatted, textArea.getText());
-//			JournalManager.saveJournal();
-		////			paintshop();
-//			App.notify("Journal was saved.");
-//		} catch (JournalException e) {
-//			App.notify(e.getMessage());
-//		}
+		try {
+			LocalDate selectedDate = calendarController.getSelectedDate();
+			String formattedDate = selectedDate.format(CalendarController.dateFormatter);
+			JournalManager.addEntry(formattedDate, textArea.getText());
+			JournalManager.saveJournal();
+			calendarController.colorizeEntryDays();
+			App.notify("Journal was saved.");
+		} catch (JournalException e) {
+			App.notify(e.getMessage());
+		}
 	}
 
 	@FXML
@@ -82,8 +84,8 @@ public class EditorPageController {
 
 	@FXML
 	private void onTodayAction() {
-		controller.drawMonth(YearMonth.now());
+		calendarController.drawMonth(YearMonth.now());
 		int today = LocalDate.now().getDayOfMonth() - 1;
-		controller.selectDayOfMonth(today);
+		calendarController.selectDayOfMonth(today);
 	}
 }
