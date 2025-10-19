@@ -38,7 +38,7 @@
             <Insets bottom="20.0" />
          </padding>
       </Label>
-      <Label prefHeight="24.0" prefWidth="135.0" text="Journal location" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+      <Label prefHeight="24.0" prefWidth="135.0" text="Location" GridPane.rowIndex="2" GridPane.valignment="CENTER">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin></Label>
