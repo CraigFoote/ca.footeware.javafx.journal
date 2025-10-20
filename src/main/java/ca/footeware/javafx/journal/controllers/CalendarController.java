@@ -14,6 +14,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
@@ -83,7 +84,8 @@ public class CalendarController extends VBox {
 				int dayNum = Integer.parseInt(dayNumStr) - 1; // days are 1-based
 				Node node = dateGrid.getChildren().get(dayNum);
 				if (node instanceof Label label && label.getText().equals(dayNumStr)) {
-					label.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, null, null)));
+					label.setBackground(
+							new Background(new BackgroundFill(Color.color(0.275, 0.51, 0.706), null, null))); // blue
 				}
 			}
 		}
@@ -93,7 +95,7 @@ public class CalendarController extends VBox {
 	 * Clear the calendar days' background colors.
 	 */
 	private void clearBackgrounds() {
-		dateGrid.getChildren().forEach((node) -> {
+		dateGrid.getChildren().forEach(node -> {
 			if (node instanceof Label label) {
 				label.setBackground(null);
 			}
@@ -103,13 +105,13 @@ public class CalendarController extends VBox {
 	/**
 	 * Colorize today's date in the calendar.
 	 */
-	private void colorizeToday() {
+	private void underlineToday() {
 		LocalDateTime now = LocalDateTime.now();
 		for (Node node : dateGrid.getChildren()) {
 			// if it's this year and month and label matches today's date
 			if (currentYearMonth.getYear() == now.getYear() && currentYearMonth.getMonth() == now.getMonth()
 					&& node instanceof Label label && label.getText().equals(String.valueOf(now.getDayOfMonth()))) {
-				label.setTextFill(Color.LIGHTCORAL);
+				label.getStyleClass().add("underlined-text");
 				return;
 			}
 		}
@@ -139,6 +141,7 @@ public class CalendarController extends VBox {
 			dayLabel.setCursor(javafx.scene.Cursor.HAND);
 			dayLabel.setTextFill(Color.WHITE);
 			dayLabel.setFont(Font.font(dayLabel.getFont().getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, 18.0));
+			dayLabel.setPadding(new Insets(1, 10, 1, 10));
 
 			dateGrid.add(dayLabel, col, row);
 		}
@@ -155,7 +158,7 @@ public class CalendarController extends VBox {
 		monthLabel.setText(currentYearMonth.getMonth().toString());
 
 		createDateGrid();
-		colorizeToday();
+		underlineToday();
 		colorizeEntryDays();
 
 		selectedEntry.setValue("");
@@ -173,7 +176,7 @@ public class CalendarController extends VBox {
 	@FXML
 	private void initialize() {
 		createDateGrid();
-		colorizeToday();
+		underlineToday();
 		colorizeEntryDays();
 
 		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
@@ -252,8 +255,8 @@ public class CalendarController extends VBox {
 	 * @param label {@link Label}
 	 */
 	private void setBorder(Label label) {
-		label.setBorder(new Border(
-				new BorderStroke(Color.BURLYWOOD, BorderStrokeStyle.SOLID, null, new BorderWidths(3)))); // green
+		label.setBorder(
+				new Border(new BorderStroke(Color.BURLYWOOD, BorderStrokeStyle.SOLID, null, new BorderWidths(3))));
 	}
 
 	/**
