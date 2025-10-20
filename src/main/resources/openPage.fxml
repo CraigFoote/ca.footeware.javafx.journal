@@ -13,7 +13,7 @@
 
 <GridPane hgap="10.0" prefHeight="171.0" prefWidth="500.0" vgap="10.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ca.footeware.javafx.journal.controllers.OpenPageController">
    <columnConstraints>
-      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="125.0" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="130.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="326.0" />
    </columnConstraints>
    <rowConstraints>
@@ -35,7 +35,7 @@
             <Insets bottom="20.0" />
          </padding>
       </Label>
-      <Label prefHeight="24.0" prefWidth="60.0" text="Location" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+      <Label prefHeight="24.0" prefWidth="98.0" text="Location" GridPane.rowIndex="2" GridPane.valignment="CENTER">
          <GridPane.margin>
             <Insets left="20.0" />
          </GridPane.margin></Label>

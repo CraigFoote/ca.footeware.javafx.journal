@@ -6,7 +6,7 @@ import java.net.URL;
 
 import org.controlsfx.control.NotificationPane;
 
-import atlantafx.base.theme.NordDark;
+//import atlantafx.base.theme.NordDark;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -55,12 +55,14 @@ public class App extends Application {
 
 	@Override
 	public void start(Stage stage) throws IOException, URISyntaxException {
-		Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
+//		Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
 		Parent root = loadFXML("/homePage");
 		notificationPane = new NotificationPane(root);
 		notificationPane.setShowFromTop(false);
 		notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
-		scene = new Scene(notificationPane, 550, 700);
+		scene = new Scene(notificationPane, 620, 700);
+		URL resource = App.class.getResource("/styles.css");
+		scene.getStylesheets().add(resource.toExternalForm());
 		Image icon = new Image(getClass().getResourceAsStream("/journal.png"));
 		stage.getIcons().add(icon);
 		stage.setTitle("Journal");

@@ -12,11 +12,11 @@
       <HBox fx:id="calendarWrapper" alignment="CENTER" prefHeight="241.0" prefWidth="497.0" />
       <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="430.0" spacing="5.0">
          <children>
-            <Button maxWidth="-Infinity" mnemonicParsing="false" onAction="#onFirstEntryAction" prefWidth="100.0" text="First" textFill="WHITE" />
-            <Button layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onPreviousEntryAction" prefWidth="100.0" text="Previous" textFill="WHITE" />
-            <Button layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onTodayAction" prefWidth="100.0" text="Today" textFill="WHITE" />
-            <Button layoutX="119.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onNextEntryAction" prefWidth="100.0" text="Next" textFill="WHITE" />
-            <Button layoutX="174.0" layoutY="10.0" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onLastEntryAction" prefWidth="100.0" text="Last" textFill="WHITE" />
+            <Button maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onFirstEntryAction" prefWidth="115.0" text="First" textFill="WHITE" />
+            <Button layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onPreviousEntryAction" prefWidth="115.0" text="Previous" textFill="WHITE" />
+            <Button layoutX="10.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onTodayAction" prefWidth="115.0" text="Today" textFill="WHITE" />
+            <Button layoutX="119.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onNextEntryAction" prefWidth="115.0" text="Next" textFill="WHITE" />
+            <Button layoutX="174.0" layoutY="10.0" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLastEntryAction" prefWidth="115.0" text="Last" textFill="WHITE" />
          </children>
          <VBox.margin>
             <Insets left="10.0" right="10.0" top="10.0" />

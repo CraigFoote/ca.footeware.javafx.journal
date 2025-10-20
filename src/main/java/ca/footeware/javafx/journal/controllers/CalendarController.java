@@ -34,7 +34,7 @@ import javafx.scene.text.FontWeight;
  */
 public class CalendarController extends VBox {
 
-	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyy-MM-dd");
+	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private Label currentSelection;
 	private YearMonth currentYearMonth;
 
@@ -83,7 +83,7 @@ public class CalendarController extends VBox {
 				int dayNum = Integer.parseInt(dayNumStr) - 1; // days are 1-based
 				Node node = dateGrid.getChildren().get(dayNum);
 				if (node instanceof Label label && label.getText().equals(dayNumStr)) {
-					label.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, null, null)));
+					label.setBackground(new Background(new BackgroundFill(Color.color(0.36, 0.50, 0.66), null, null))); // blue
 				}
 			}
 		}
@@ -112,7 +112,7 @@ public class CalendarController extends VBox {
 				Font currentFont = label.getFont();
 				label.setFont(Font.font(currentFont.getFamily(), FontWeight.NORMAL, FontPosture.REGULAR,
 						currentFont.getSize()));
-				label.setTextFill(Color.RED);
+				label.setTextFill(Color.color(0.75, 0.38, 0.42)); // red
 				return;
 			}
 		}
@@ -252,7 +252,8 @@ public class CalendarController extends VBox {
 	 * @param label {@link Label}
 	 */
 	private void setBorder(Label label) {
-		label.setBorder(new Border(new BorderStroke(Color.GREEN, BorderStrokeStyle.SOLID, null, new BorderWidths(5))));
+		label.setBorder(new Border(
+				new BorderStroke(Color.color(0.59, 0.69, 0.51), BorderStrokeStyle.SOLID, null, new BorderWidths(3)))); // green
 	}
 
 	/**
