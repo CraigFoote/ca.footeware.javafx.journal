@@ -83,7 +83,7 @@ public class CalendarController extends VBox {
 				int dayNum = Integer.parseInt(dayNumStr) - 1; // days are 1-based
 				Node node = dateGrid.getChildren().get(dayNum);
 				if (node instanceof Label label && label.getText().equals(dayNumStr)) {
-					label.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+					label.setBackground(new Background(new BackgroundFill(Color.DARKBLUE, null, null)));
 				}
 			}
 		}
@@ -109,10 +109,7 @@ public class CalendarController extends VBox {
 			// if it's this year and month and label matches today's date
 			if (currentYearMonth.getYear() == now.getYear() && currentYearMonth.getMonth() == now.getMonth()
 					&& node instanceof Label label && label.getText().equals(String.valueOf(now.getDayOfMonth()))) {
-				Font currentFont = label.getFont();
-				label.setFont(Font.font(currentFont.getFamily(), FontWeight.NORMAL, FontPosture.REGULAR,
-						currentFont.getSize()));
-				label.setTextFill(Color.RED);
+				label.setTextFill(Color.LIGHTCORAL);
 				return;
 			}
 		}
@@ -140,6 +137,8 @@ public class CalendarController extends VBox {
 
 			dayLabel.setOnMouseClicked(_ -> onDayLabelClicked(dayLabel));
 			dayLabel.setCursor(javafx.scene.Cursor.HAND);
+			dayLabel.setTextFill(Color.WHITE);
+			dayLabel.setFont(Font.font(dayLabel.getFont().getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, 18.0));
 
 			dateGrid.add(dayLabel, col, row);
 		}
@@ -189,6 +188,7 @@ public class CalendarController extends VBox {
 				currentSelection = label;
 				try {
 					selectedEntry = new SimpleStringProperty(JournalManager.getEntry(today));
+					onDayLabelClicked(label);
 				} catch (JournalException e) {
 					App.notify(e.getMessage());
 				}
@@ -253,7 +253,7 @@ public class CalendarController extends VBox {
 	 */
 	private void setBorder(Label label) {
 		label.setBorder(new Border(
-				new BorderStroke(Color.color(0.59, 0.69, 0.51), BorderStrokeStyle.SOLID, null, new BorderWidths(3)))); // green
+				new BorderStroke(Color.BURLYWOOD, BorderStrokeStyle.SOLID, null, new BorderWidths(3)))); // green
 	}
 
 	/**

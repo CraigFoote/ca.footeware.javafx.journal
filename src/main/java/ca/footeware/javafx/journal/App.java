@@ -55,7 +55,6 @@ public class App extends Application {
 
 	@Override
 	public void start(Stage stage) throws IOException, URISyntaxException {
-//		Application.setUserAgentStylesheet(new NordDark().getUserAgentStylesheet());
 		Parent root = loadFXML("/homePage");
 		notificationPane = new NotificationPane(root);
 		notificationPane.setShowFromTop(false);
