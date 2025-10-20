@@ -83,7 +83,7 @@ public class CalendarController extends VBox {
 				int dayNum = Integer.parseInt(dayNumStr) - 1; // days are 1-based
 				Node node = dateGrid.getChildren().get(dayNum);
 				if (node instanceof Label label && label.getText().equals(dayNumStr)) {
-					label.setBackground(new Background(new BackgroundFill(Color.color(0.36, 0.50, 0.66), null, null))); // blue
+					label.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
 				}
 			}
 		}
@@ -112,7 +112,7 @@ public class CalendarController extends VBox {
 				Font currentFont = label.getFont();
 				label.setFont(Font.font(currentFont.getFamily(), FontWeight.NORMAL, FontPosture.REGULAR,
 						currentFont.getSize()));
-				label.setTextFill(Color.color(0.75, 0.38, 0.42)); // red
+				label.setTextFill(Color.RED);
 				return;
 			}
 		}
