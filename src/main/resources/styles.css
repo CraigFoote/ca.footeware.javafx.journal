@@ -20,4 +20,7 @@
 
 .saveButton {
 	-fx-padding: 5;
+
+.underlined-text {
+    -fx-underline: true;
 }
