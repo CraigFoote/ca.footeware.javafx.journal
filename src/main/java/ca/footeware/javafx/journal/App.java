@@ -3,11 +3,15 @@ package ca.footeware.javafx.journal;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.controlsfx.control.NotificationPane;
 
 //import atlantafx.base.theme.NordDark;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,7 +32,7 @@ public class App extends Application {
 		return scene.getWindow();
 	}
 
-	public static Parent loadFXML(String fxml) throws IOException, URISyntaxException {
+	public static Parent loadFXML(String fxml) throws IOException {
 		URL resource = App.class.getResource(fxml + ".fxml");
 		loader = new FXMLLoader(resource);
 		return loader.load();
@@ -41,10 +45,12 @@ public class App extends Application {
 	public static void notify(String message) {
 		notificationPane.setText(message);
 		notificationPane.show();
-	}
-
-	public static void sayHello() {
-		System.err.println("Hello!");
+		ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+		service.schedule(() -> {
+			Platform.runLater(() -> {
+				notificationPane.hide();
+			});
+		}, 5, TimeUnit.SECONDS);
 	}
 
 	public static void setRoot(String fxml) throws IOException, URISyntaxException {

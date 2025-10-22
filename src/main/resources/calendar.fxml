@@ -19,7 +19,7 @@
 					<children>
 						<Button contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onPreviousYearAction" prefHeight="26.0" prefWidth="30.0" styleClass="nav" stylesheets="@styles.css" textFill="WHITE">
                      <graphic>
-                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@previous.png" />
                            </image>
@@ -32,7 +32,7 @@
 						</Label>
       						<Button contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onNextYearAction" prefHeight="26.0" prefWidth="30.0" styleClass="nav" stylesheets="@styles.css" textFill="WHITE">
                      <graphic>
-                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@next.png" />
                            </image>
@@ -45,7 +45,7 @@
 					<children>
                   <Button contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onPreviousMonthAction" prefHeight="26.0" prefWidth="30.0" styleClass="nav" stylesheets="@styles.css" textFill="WHITE">
                      <graphic>
-                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@previous.png" />
                            </image>
@@ -59,7 +59,7 @@
 						</Label>
                   <Button contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onNextMonthAction" prefHeight="26.0" prefWidth="30.0" styleClass="nav" stylesheets="@styles.css" textFill="WHITE">
                      <graphic>
-                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@next.png" />
                            </image>

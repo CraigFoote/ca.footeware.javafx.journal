@@ -64,22 +64,32 @@ public class EditorPageController {
 
 	@FXML
 	private void onFirstEntryAction() {
-		App.sayHello();
+		LocalDate firstEntryDate = JournalManager.getFirstEntryDate();
+		YearMonth yearMonth = YearMonth.of(firstEntryDate.getYear(), firstEntryDate.getMonth());
+		calendarController.drawMonth(yearMonth);
+		calendarController.selectDayOfMonth(firstEntryDate.getDayOfMonth() - 1);
 	}
 
 	@FXML
 	private void onLastEntryAction() {
-		App.sayHello();
+		LocalDate lastEntryDate = JournalManager.getLastEntryDate();
+		YearMonth yearMonth = YearMonth.of(lastEntryDate.getYear(), lastEntryDate.getMonth());
+		calendarController.drawMonth(yearMonth);
+		calendarController.selectDayOfMonth(lastEntryDate.getDayOfMonth() - 1);
 	}
 
 	@FXML
 	private void onNextEntryAction() {
-		App.sayHello();
+		LocalDate selectedDate = calendarController.getSelectedDate();
+		LocalDate nextEntryDate = JournalManager.getNextEntryDate(selectedDate);
+		YearMonth yearMonth = YearMonth.of(nextEntryDate.getYear(), nextEntryDate.getMonth());
+		calendarController.drawMonth(yearMonth);
+		calendarController.selectDayOfMonth(nextEntryDate.getDayOfMonth() - 1);
 	}
 
 	@FXML
 	private void onPreviousEntryAction() {
-		App.sayHello();
+		// TODO
 	}
 
 	@FXML

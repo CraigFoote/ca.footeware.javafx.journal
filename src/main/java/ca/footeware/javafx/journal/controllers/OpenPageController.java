@@ -38,9 +38,8 @@ public class OpenPageController {
 			verifyInputs();
 			JournalManager.openJournal(browseButton.getText(), passwordField.getText());
 			App.setRoot("/editorPage");
-		} catch (IOException | JournalException | URISyntaxException e) {
+		} catch (IOException | JournalException | URISyntaxException | IllegalArgumentException e) {
 			App.notify(e.getMessage());
-			e.printStackTrace();
 		}
 	}
 

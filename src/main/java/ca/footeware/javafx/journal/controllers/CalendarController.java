@@ -23,6 +23,7 @@ import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -75,17 +76,18 @@ public class CalendarController extends VBox {
 	 */
 	public void colorizeEntryDays() {
 		clearBackgrounds();
-		LocalDate now = LocalDate.now();
 		List<String> entryDates = JournalManager.getEntryDates();
-		for (String entryDate : entryDates) {
-			// if displaying this year and month, find the today label and colorize it
-			if (now.getYear() == currentYearMonth.getYear() && now.getMonth() == currentYearMonth.getMonth()) {
-				String dayNumStr = entryDate.substring(entryDate.lastIndexOf("-") + 1);
+		for (String entryDateStr : entryDates) {
+			LocalDate entryDate = LocalDate.parse(entryDateStr, dateFormatter);
+			// filter to retain only those days in the currently selected YearMonth
+			if (entryDate.getYear() == currentYearMonth.getYear()
+					&& entryDate.getMonth() == currentYearMonth.getMonth()) {
+				String dayNumStr = entryDateStr.substring(entryDateStr.lastIndexOf("-") + 1); // yyyy-MM-dd
 				int dayNum = Integer.parseInt(dayNumStr) - 1; // days are 1-based
 				Node node = dateGrid.getChildren().get(dayNum);
-				if (node instanceof Label label && label.getText().equals(dayNumStr)) {
-					label.setBackground(
-							new Background(new BackgroundFill(Color.color(0.275, 0.51, 0.706), null, null))); // blue
+				if (node instanceof Label label) {
+					label.setBackground(new Background(
+							new BackgroundFill(Color.color(0.275, 0.51, 0.706), new CornerRadii(5), null))); // blue
 				}
 			}
 		}
@@ -105,13 +107,14 @@ public class CalendarController extends VBox {
 	/**
 	 * Colorize today's date in the calendar.
 	 */
-	private void underlineToday() {
+	private void colorizeToday() {
 		LocalDateTime now = LocalDateTime.now();
 		for (Node node : dateGrid.getChildren()) {
 			// if it's this year and month and label matches today's date
 			if (currentYearMonth.getYear() == now.getYear() && currentYearMonth.getMonth() == now.getMonth()
 					&& node instanceof Label label && label.getText().equals(String.valueOf(now.getDayOfMonth()))) {
-				label.getStyleClass().add("underlined-text");
+				label.setFont(Font.font(label.getFont().getFamily(), FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 18.0));
+				label.getStyleClass().add("today");
 				return;
 			}
 		}
@@ -152,13 +155,13 @@ public class CalendarController extends VBox {
 	 *
 	 * @param ym {@link YearMonth}
 	 */
-	void drawMonth(YearMonth ym) {
+	public void drawMonth(YearMonth ym) {
 		currentYearMonth = ym;
 		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
 		monthLabel.setText(currentYearMonth.getMonth().toString());
 
 		createDateGrid();
-		underlineToday();
+		colorizeToday();
 		colorizeEntryDays();
 
 		selectedEntry.setValue("");
@@ -176,7 +179,7 @@ public class CalendarController extends VBox {
 	@FXML
 	private void initialize() {
 		createDateGrid();
-		underlineToday();
+		colorizeToday();
 		colorizeEntryDays();
 
 		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
@@ -250,13 +253,13 @@ public class CalendarController extends VBox {
 	}
 
 	/**
-	 * Set a green border around the provided label.
+	 * Set a horseshit brown border around the provided label.
 	 *
 	 * @param label {@link Label}
 	 */
 	private void setBorder(Label label) {
-		label.setBorder(
-				new Border(new BorderStroke(Color.BURLYWOOD, BorderStrokeStyle.SOLID, null, new BorderWidths(3))));
+		label.setBorder(new Border(
+				new BorderStroke(Color.BURLYWOOD, BorderStrokeStyle.SOLID, new CornerRadii(5), new BorderWidths(3))));
 	}
 
 	/**
@@ -273,7 +276,7 @@ public class CalendarController extends VBox {
 
 	/**
 	 * Gets the currently selected date.
-	 * 
+	 *
 	 * @return {@link LocalDate}
 	 */
 	public LocalDate getSelectedDate() {

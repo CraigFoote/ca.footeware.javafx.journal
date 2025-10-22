@@ -14,13 +14,10 @@
     -fx-padding: 10.0 20.0 10.0 20.0;
 }
 
-.nav {
+.nav .saveButton {
 	-fx-padding: 5;
 }
 
-.saveButton {
-	-fx-padding: 5;
-
-.underlined-text {
-    -fx-underline: true;
+.today {
+    -fx-text-fill: #7FFF00;
 }

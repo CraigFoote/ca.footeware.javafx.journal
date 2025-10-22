@@ -9,6 +9,8 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import ca.footeware.javafx.journal.exceptions.JournalException;
  */
 public class JournalManager {
 
+	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private static Journal journal;
 
 	/**
@@ -125,5 +128,60 @@ public class JournalManager {
 			keys.add(key);
 		}
 		return keys;
+	}
+
+	public static LocalDate getFirstEntryDate() {
+		String formattedDate = getEntryDates().get(0);
+		return LocalDate.parse(formattedDate, dateFormatter);
+	}
+
+	public static LocalDate getLastEntryDate() {
+		List<String> entryDates = getEntryDates();
+		String formattedDate = entryDates.get(entryDates.size() - 1);
+		return LocalDate.parse(formattedDate, dateFormatter);
+	}
+
+	/**
+	 * Get the next journal entry after the provided date.
+	 *
+	 * @param selectedDate {@link LocalDate}
+	 * @return {@link LocalDate} may be the same as the provided date
+	 */
+	public static LocalDate getNextEntryDate(LocalDate selectedDate) {
+		List<String> entryDates = getEntryDates();
+		switch (entryDates.size()) {
+		case 0 -> {
+			return selectedDate;
+		}
+		case 1 -> {
+			String dateStr = entryDates.get(0);
+			LocalDate entryDate = LocalDate.parse(dateStr, dateFormatter);
+			if (entryDate.isAfter(selectedDate)) {
+				return entryDate;
+			} else if (entryDate.isBefore(selectedDate)) {
+				return selectedDate; // don't wrap
+			} else if (entryDate.isEqual(selectedDate)) {
+				return selectedDate;
+			}
+		}
+		default -> {
+			for (int i = 0; i < entryDates.size(); i++) {
+				String entryDate1 = entryDates.get(i);
+				LocalDate date1 = LocalDate.parse(entryDate1, dateFormatter);
+				if (selectedDate.isBefore(date1)) {
+					return date1;
+				} else if ((i + 1) < entryDates.size()) {
+					String entryDate2 = entryDates.get(i + 1);
+					LocalDate date2 = LocalDate.parse(entryDate2, dateFormatter);
+					if (date1.isEqual(selectedDate) || (date1.isBefore(selectedDate) && date2.isAfter(selectedDate))) {
+						return date2; // next entry
+					}
+				}
+			}
+		}
+		}
+
+		// fallback is same date
+		return selectedDate;
 	}
 }
