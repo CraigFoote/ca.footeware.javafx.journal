@@ -17,13 +17,16 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * Is it an encryption service or something more sinister?
+ */
 public class Superstar {
 
 	/**
 	 * Decrypt data using the given password.
 	 *
-	 * @param encryptedData
-	 * @param password
+	 * @param encryptedData {@link String}
+	 * @param password      {@link String}
 	 * @return {@link String}
 	 * @throws NoSuchAlgorithmException
 	 * @throws NoSuchPaddingException
@@ -121,6 +124,9 @@ public class Superstar {
 		return new SecretKeySpec(encodedKey, "AES");
 	}
 
+	/**
+	 * Constructor, hidden because all methods are static.
+	 */
 	private Superstar() {
 	}
 }

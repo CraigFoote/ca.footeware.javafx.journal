@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import ca.footeware.javafx.journal.App;
@@ -36,7 +35,6 @@ import javafx.scene.text.FontWeight;
  */
 public class CalendarController extends VBox {
 
-	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private Label currentSelection;
 	private YearMonth currentYearMonth;
 
@@ -78,7 +76,7 @@ public class CalendarController extends VBox {
 		clearBackgrounds();
 		List<String> entryDates = JournalManager.getEntryDates();
 		for (String entryDateStr : entryDates) {
-			LocalDate entryDate = LocalDate.parse(entryDateStr, dateFormatter);
+			LocalDate entryDate = LocalDate.parse(entryDateStr, App.dateFormatter);
 			// filter to retain only those days in the currently selected YearMonth
 			if (entryDate.getYear() == currentYearMonth.getYear()
 					&& entryDate.getMonth() == currentYearMonth.getMonth()) {
@@ -213,7 +211,7 @@ public class CalendarController extends VBox {
 		clearBorders();
 		setBorder(label);
 		LocalDate selectedDate = currentYearMonth.atDay(Integer.parseInt(currentSelection.getText()));
-		String formatted = selectedDate.format(dateFormatter);
+		String formatted = selectedDate.format(App.dateFormatter);
 		try {
 			String entry = JournalManager.getEntry(formatted);
 			selectedEntry.setValue(entry != null ? entry : "");

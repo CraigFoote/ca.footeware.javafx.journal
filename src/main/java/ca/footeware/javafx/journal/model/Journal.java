@@ -21,7 +21,9 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 /**
- *
+ * A wrapper around a {@link Properties} file persisting a {@link TreeMap} whose
+ * keys are date {@link String}s in format yyyy-MM-dd and the values are
+ * encrypted {@link String}s.
  */
 public class Journal {
 

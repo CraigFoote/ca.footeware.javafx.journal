@@ -22,7 +22,7 @@ import javax.crypto.NoSuchPaddingException;
 import ca.footeware.javafx.journal.exceptions.JournalException;
 
 /**
- *
+ * Provides a read/write interface to the {@link Journal}.
  */
 public class JournalManager {
 
@@ -83,7 +83,7 @@ public class JournalManager {
 	}
 
 	/**
-	 * Opens an existing journal of the specified file path and using the provided
+	 * Opens an existing journal at the specified file path and using the provided
 	 * password.
 	 *
 	 * @param path     {@link String}
@@ -124,6 +124,11 @@ public class JournalManager {
 	private JournalManager() {
 	}
 
+	/**
+	 * Get the dates/keys from the journal.
+	 * 
+	 * @return {@link List} of {@link String}
+	 */
 	public static List<String> getEntryDates() {
 		List<String> keys = new ArrayList<>();
 		Map<String, String> entries = journal.getEntries();
@@ -214,8 +219,8 @@ public class JournalManager {
 		}
 		default -> {
 			/*
-			 * Parse over entryDates backwards. If selectedDate after the last entryDate,
-			 * return the entryDate. If there's a following (prior) entryDate, and the
+			 * Parse over entryDates backwards. If selectedDate is after the last entryDate,
+			 * return the entryDate. Else, if there's a following (prior) entryDate, and the
 			 * selectedDate is after that second entryDate, or between the two entryDates,
 			 * return the first entryDate.
 			 */

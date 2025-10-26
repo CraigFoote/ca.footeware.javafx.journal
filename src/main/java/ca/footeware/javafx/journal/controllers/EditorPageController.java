@@ -52,7 +52,7 @@ public class EditorPageController {
 	private void onSaveAction() {
 		try {
 			LocalDate selectedDate = calendarController.getSelectedDate();
-			String formattedDate = selectedDate.format(CalendarController.dateFormatter);
+			String formattedDate = selectedDate.format(App.dateFormatter);
 			JournalManager.addEntry(formattedDate, textArea.getText());
 			JournalManager.saveJournal();
 			calendarController.colorizeEntryDays();

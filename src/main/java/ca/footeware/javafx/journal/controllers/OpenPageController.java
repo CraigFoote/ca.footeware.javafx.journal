@@ -2,7 +2,6 @@ package ca.footeware.javafx.journal.controllers;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
@@ -38,13 +37,13 @@ public class OpenPageController {
 			verifyInputs();
 			JournalManager.openJournal(browseButton.getText(), passwordField.getText());
 			App.setRoot("/editorPage");
-		} catch (IOException | JournalException | URISyntaxException | IllegalArgumentException e) {
+		} catch (IOException | JournalException | IllegalArgumentException e) {
 			App.notify(e.getMessage());
 		}
 	}
 
 	@FXML
-	private void onSwitchToHomePageAction() throws IOException, URISyntaxException {
+	private void onSwitchToHomePageAction() throws IOException {
 		App.setRoot("/homePage");
 	}
 
