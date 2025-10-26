@@ -19,13 +19,13 @@ import javafx.scene.layout.HBox;
  */
 public class EditorPageController {
 
-	@FXML
-	private TextArea textArea;
+	private CalendarController calendarController;
 
 	@FXML
 	private HBox calendarWrapper;
 
-	private CalendarController calendarController;
+	@FXML
+	private TextArea textArea;
 
 	/**
 	 * Called after injection of widgets.
@@ -49,33 +49,23 @@ public class EditorPageController {
 	}
 
 	@FXML
-	private void onSaveAction() {
-		try {
-			LocalDate selectedDate = calendarController.getSelectedDate();
-			String formattedDate = selectedDate.format(App.dateFormatter);
-			JournalManager.addEntry(formattedDate, textArea.getText());
-			JournalManager.saveJournal();
-			calendarController.colorizeEntryDays();
-			App.notify("Journal was saved.");
-		} catch (JournalException e) {
-			App.notify(e.getMessage());
-		}
-	}
-
-	@FXML
 	private void onFirstEntryAction() {
 		LocalDate firstEntryDate = JournalManager.getFirstEntryDate();
-		YearMonth yearMonth = YearMonth.of(firstEntryDate.getYear(), firstEntryDate.getMonth());
-		calendarController.drawMonth(yearMonth);
-		calendarController.selectDayOfMonth(firstEntryDate.getDayOfMonth() - 1);
+		if (firstEntryDate != null) {
+			YearMonth yearMonth = YearMonth.of(firstEntryDate.getYear(), firstEntryDate.getMonth());
+			calendarController.drawMonth(yearMonth);
+			calendarController.selectDayOfMonth(firstEntryDate.getDayOfMonth() - 1);
+		}
 	}
 
 	@FXML
 	private void onLastEntryAction() {
 		LocalDate lastEntryDate = JournalManager.getLastEntryDate();
-		YearMonth yearMonth = YearMonth.of(lastEntryDate.getYear(), lastEntryDate.getMonth());
-		calendarController.drawMonth(yearMonth);
-		calendarController.selectDayOfMonth(lastEntryDate.getDayOfMonth() - 1);
+		if (lastEntryDate != null) {
+			YearMonth yearMonth = YearMonth.of(lastEntryDate.getYear(), lastEntryDate.getMonth());
+			calendarController.drawMonth(yearMonth);
+			calendarController.selectDayOfMonth(lastEntryDate.getDayOfMonth() - 1);
+		}
 	}
 
 	@FXML
@@ -94,6 +84,20 @@ public class EditorPageController {
 		YearMonth newYearMonth = YearMonth.of(previousEntryDate.getYear(), previousEntryDate.getMonth());
 		calendarController.drawMonth(newYearMonth);
 		calendarController.selectDayOfMonth(previousEntryDate.getDayOfMonth() - 1);
+	}
+
+	@FXML
+	private void onSaveAction() {
+		try {
+			LocalDate selectedDate = calendarController.getSelectedDate();
+			String formattedDate = selectedDate.format(App.dateFormatter);
+			JournalManager.addEntry(formattedDate, textArea.getText());
+			JournalManager.saveJournal();
+			calendarController.colorizeEntryDays();
+			App.notify("Journal was saved.");
+		} catch (JournalException e) {
+			App.notify(e.getMessage());
+		}
 	}
 
 	@FXML

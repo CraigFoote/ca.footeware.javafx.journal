@@ -28,13 +28,14 @@ public class App extends Application {
 	 * Formatter for dates to provide a {@link String} in format yyyy-MM-dd.
 	 */
 	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 	private static FXMLLoader loader;
 	private static NotificationPane notificationPane;
 	private static Scene scene;
 
 	/**
 	 * Return the window.
-	 * 
+	 *
 	 * @return {@link Window}
 	 */
 	public static Window getPrimaryStage() {
@@ -43,7 +44,7 @@ public class App extends Application {
 
 	/**
 	 * Load the provided FXML file into the scene graph.
-	 * 
+	 *
 	 * @param fxml {@link String} the name of the .fxml file without the extension.
 	 * @return {@link Parent} the root of the FXML file
 	 * @throws IOException if worlds collide
@@ -56,7 +57,7 @@ public class App extends Application {
 
 	/**
 	 * The method to call to launch the application.
-	 * 
+	 *
 	 * @param args {@link String}[]
 	 */
 	public static void main(String[] args) {
@@ -66,21 +67,21 @@ public class App extends Application {
 	/**
 	 * Presents an in-window notification panel at the bottom of the application
 	 * window, containing the provided message.
-	 * 
+	 *
 	 * @param message {@link String}
 	 */
 	public static void notify(String message) {
 		notificationPane.setText(message);
 		notificationPane.show();
-		try (ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor()) {
-			service.schedule(() -> Platform.runLater(() -> notificationPane.hide()), 5, TimeUnit.SECONDS);
-		}
+
+		Runnable closer = (() -> Platform.runLater(() -> notificationPane.hide()));
+		scheduler.schedule(closer, 5, TimeUnit.SECONDS);
 	}
 
 	/**
 	 * Loads the provided FXML file and passes its parent root to the notification
 	 * pane to be set as child widget.
-	 * 
+	 *
 	 * @param fxml the name of the .fxml file without the extension.
 	 * @throws IOException if some other worlds collide
 	 */

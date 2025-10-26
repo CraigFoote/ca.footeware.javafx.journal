@@ -59,6 +59,17 @@ public class CalendarController extends VBox {
 	}
 
 	/**
+	 * Clear the calendar days' background colors.
+	 */
+	private void clearBackgrounds() {
+		dateGrid.getChildren().forEach(node -> {
+			if (node instanceof Label label) {
+				label.setBackground(null);
+			}
+		});
+	}
+
+	/**
 	 * Clear all {@link #dateGrid} labels of borders.
 	 */
 	private void clearBorders() {
@@ -89,17 +100,6 @@ public class CalendarController extends VBox {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Clear the calendar days' background colors.
-	 */
-	private void clearBackgrounds() {
-		dateGrid.getChildren().forEach(node -> {
-			if (node instanceof Label label) {
-				label.setBackground(null);
-			}
-		});
 	}
 
 	/**
@@ -163,6 +163,16 @@ public class CalendarController extends VBox {
 		colorizeEntryDays();
 
 		selectedEntry.setValue("");
+	}
+
+	/**
+	 * Gets the currently selected date.
+	 *
+	 * @return {@link LocalDate}
+	 */
+	public LocalDate getSelectedDate() {
+		return LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
+				Integer.parseInt(currentSelection.getText()));
 	}
 
 	/**
@@ -251,16 +261,6 @@ public class CalendarController extends VBox {
 	}
 
 	/**
-	 * Set a horseshit brown border around the provided label.
-	 *
-	 * @param label {@link Label}
-	 */
-	private void setBorder(Label label) {
-		label.setBorder(new Border(
-				new BorderStroke(Color.BURLYWOOD, BorderStrokeStyle.SOLID, new CornerRadii(5), new BorderWidths(3))));
-	}
-
-	/**
 	 * Select a day of the month programmatically.
 	 *
 	 * @param today int the day of the month to select
@@ -273,12 +273,12 @@ public class CalendarController extends VBox {
 	}
 
 	/**
-	 * Gets the currently selected date.
+	 * Set a horseshit brown border around the provided label.
 	 *
-	 * @return {@link LocalDate}
+	 * @param label {@link Label}
 	 */
-	public LocalDate getSelectedDate() {
-		return LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
-				Integer.parseInt(currentSelection.getText()));
+	private void setBorder(Label label) {
+		label.setBorder(new Border(
+				new BorderStroke(Color.BURLYWOOD, BorderStrokeStyle.SOLID, new CornerRadii(5), new BorderWidths(3))));
 	}
 }

@@ -83,50 +83,8 @@ public class JournalManager {
 	}
 
 	/**
-	 * Opens an existing journal at the specified file path and using the provided
-	 * password.
-	 *
-	 * @param path     {@link String}
-	 * @param password {@link String}
-	 * @throws IOException      if the file is not found
-	 * @throws JournalException if the password is incorrect
-	 */
-	public static void openJournal(String path, String password) throws IOException, JournalException {
-		File file = new File(path);
-		if (!file.exists()) {
-			throw new IOException("File not found: " + file.getAbsolutePath());
-		}
-		if (!file.canWrite()) {
-			throw new IOException("File is read-only: " + file.getAbsolutePath());
-		}
-		journal = new Journal(file, password);
-		if (!journal.testPassword()) {
-			throw new JournalException("Incorrect password.");
-		}
-	}
-
-	/**
-	 * Save the journal to file.
-	 *
-	 * @throws JournalException
-	 */
-	public static void saveJournal() throws JournalException {
-		try {
-			journal.save();
-		} catch (IOException e) {
-			throw new JournalException("Error saving journal.", e);
-		}
-	}
-
-	/**
-	 * Constructor, hidden because all methods are static.
-	 */
-	private JournalManager() {
-	}
-
-	/**
 	 * Get the dates/keys from the journal.
-	 * 
+	 *
 	 * @return {@link List} of {@link String}
 	 */
 	public static List<String> getEntryDates() {
@@ -140,22 +98,29 @@ public class JournalManager {
 
 	/**
 	 * Get the first journal entry date (key).
-	 * 
+	 *
 	 * @return {@link LocalDate}
 	 */
 	public static LocalDate getFirstEntryDate() {
-		return LocalDate.parse(getEntryDates().get(0), dateFormatter);
+		List<String> entryDates = getEntryDates();
+		if (!entryDates.isEmpty()) {
+			return LocalDate.parse(entryDates.get(0), dateFormatter);
+		}
+		return null;
 	}
 
 	/**
 	 * Get the last journal entry date (key).
-	 * 
+	 *
 	 * @return {@link LocalDate}
 	 */
 	public static LocalDate getLastEntryDate() {
 		List<String> entryDates = getEntryDates();
-		String formattedDate = entryDates.get(entryDates.size() - 1);
-		return LocalDate.parse(formattedDate, dateFormatter);
+		if (!entryDates.isEmpty()) {
+			String formattedDate = entryDates.get(entryDates.size() - 1);
+			return LocalDate.parse(formattedDate, dateFormatter);
+		}
+		return null;
 	}
 
 	/**
@@ -241,5 +206,47 @@ public class JournalManager {
 		}
 		// fallback is same date
 		return selectedDate;
+	}
+
+	/**
+	 * Opens an existing journal at the specified file path and using the provided
+	 * password.
+	 *
+	 * @param path     {@link String}
+	 * @param password {@link String}
+	 * @throws IOException      if the file is not found
+	 * @throws JournalException if the password is incorrect
+	 */
+	public static void openJournal(String path, String password) throws IOException, JournalException {
+		File file = new File(path);
+		if (!file.exists()) {
+			throw new IOException("File not found: " + file.getAbsolutePath());
+		}
+		if (!file.canWrite()) {
+			throw new IOException("File is read-only: " + file.getAbsolutePath());
+		}
+		journal = new Journal(file, password);
+		if (!journal.testPassword()) {
+			throw new JournalException("Incorrect password.");
+		}
+	}
+
+	/**
+	 * Save the journal to file.
+	 *
+	 * @throws JournalException
+	 */
+	public static void saveJournal() throws JournalException {
+		try {
+			journal.save();
+		} catch (IOException e) {
+			throw new JournalException("Error saving journal.", e);
+		}
+	}
+
+	/**
+	 * Constructor, hidden because all methods are static.
+	 */
+	private JournalManager() {
 	}
 }
