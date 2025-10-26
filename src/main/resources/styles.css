@@ -1,5 +1,5 @@
 .root { 
-    -fx-accent: #4c566a;
+    -fx-accent: #ff0004;
     -fx-focus-color: -fx-accent;
     -fx-base: #20242a;
     -fx-font-size: 16.0;
@@ -12,10 +12,12 @@
     -fx-font-family: "Arial";
     -fx-font-size: 16.0;
     -fx-padding: 10.0 20.0 10.0 20.0;
+    -fx-stroke: -fx-accent;
+    -fx-stroke-width: 5.0;
 }
 
 .nav .saveButton {
-	-fx-padding: 5;
+	-fx-padding: 5.0;
 }
 
 .today {

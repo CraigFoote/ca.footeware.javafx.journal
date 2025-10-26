@@ -82,14 +82,18 @@ public class EditorPageController {
 	private void onNextEntryAction() {
 		LocalDate selectedDate = calendarController.getSelectedDate();
 		LocalDate nextEntryDate = JournalManager.getNextEntryDate(selectedDate);
-		YearMonth yearMonth = YearMonth.of(nextEntryDate.getYear(), nextEntryDate.getMonth());
-		calendarController.drawMonth(yearMonth);
+		YearMonth newYearMonth = YearMonth.of(nextEntryDate.getYear(), nextEntryDate.getMonth());
+		calendarController.drawMonth(newYearMonth);
 		calendarController.selectDayOfMonth(nextEntryDate.getDayOfMonth() - 1);
 	}
 
 	@FXML
 	private void onPreviousEntryAction() {
-		// TODO
+		LocalDate selectedDate = calendarController.getSelectedDate();
+		LocalDate previousEntryDate = JournalManager.getPreviousEntryDate(selectedDate);
+		YearMonth newYearMonth = YearMonth.of(previousEntryDate.getYear(), previousEntryDate.getMonth());
+		calendarController.drawMonth(newYearMonth);
+		calendarController.selectDayOfMonth(previousEntryDate.getDayOfMonth() - 1);
 	}
 
 	@FXML

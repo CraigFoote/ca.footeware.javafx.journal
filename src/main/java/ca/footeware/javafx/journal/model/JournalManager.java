@@ -106,7 +106,7 @@ public class JournalManager {
 	}
 
 	/**
-	 * Save the journal.
+	 * Save the journal to file.
 	 *
 	 * @throws JournalException
 	 */
@@ -118,6 +118,9 @@ public class JournalManager {
 		}
 	}
 
+	/**
+	 * Constructor, hidden because all methods are static.
+	 */
 	private JournalManager() {
 	}
 
@@ -130,11 +133,20 @@ public class JournalManager {
 		return keys;
 	}
 
+	/**
+	 * Get the first journal entry date (key).
+	 * 
+	 * @return {@link LocalDate}
+	 */
 	public static LocalDate getFirstEntryDate() {
-		String formattedDate = getEntryDates().get(0);
-		return LocalDate.parse(formattedDate, dateFormatter);
+		return LocalDate.parse(getEntryDates().get(0), dateFormatter);
 	}
 
+	/**
+	 * Get the last journal entry date (key).
+	 * 
+	 * @return {@link LocalDate}
+	 */
 	public static LocalDate getLastEntryDate() {
 		List<String> entryDates = getEntryDates();
 		String formattedDate = entryDates.get(entryDates.size() - 1);
@@ -154,17 +166,16 @@ public class JournalManager {
 			return selectedDate;
 		}
 		case 1 -> {
-			String dateStr = entryDates.get(0);
-			LocalDate entryDate = LocalDate.parse(dateStr, dateFormatter);
-			if (entryDate.isAfter(selectedDate)) {
-				return entryDate;
-			} else if (entryDate.isBefore(selectedDate)) {
-				return selectedDate; // don't wrap
-			} else if (entryDate.isEqual(selectedDate)) {
-				return selectedDate;
-			}
+			LocalDate entryDate = LocalDate.parse(entryDates.get(0), dateFormatter);
+			return entryDate.isAfter(selectedDate) ? entryDate : selectedDate;
 		}
 		default -> {
+			/*
+			 * Parse over entryDates. If selectedDate is before the first entryDate, return
+			 * the entryDate. Else if there's a following entryDate, and the selectedDate is
+			 * either equal to that second entryDate, or between the two entryDates, return
+			 * the second entryDate.
+			 */
 			for (int i = 0; i < entryDates.size(); i++) {
 				String entryDate1 = entryDates.get(i);
 				LocalDate date1 = LocalDate.parse(entryDate1, dateFormatter);
@@ -180,7 +191,49 @@ public class JournalManager {
 			}
 		}
 		}
+		// fallback is same date
+		return selectedDate;
+	}
 
+	/**
+	 * Get the previous journal entry before the provided date.
+	 *
+	 * @param selectedDate {@link LocalDate}
+	 * @return {@link LocalDate} may be the same as the provided date if there's no
+	 *         previous entry
+	 */
+	public static LocalDate getPreviousEntryDate(LocalDate selectedDate) {
+		List<String> entryDates = getEntryDates();
+		switch (entryDates.size()) {
+		case 0 -> {
+			return selectedDate;
+		}
+		case 1 -> {
+			LocalDate entryDate = LocalDate.parse(entryDates.get(0), dateFormatter);
+			return entryDate.isBefore(selectedDate) ? entryDate : selectedDate;
+		}
+		default -> {
+			/*
+			 * Parse over entryDates backwards. If selectedDate after the last entryDate,
+			 * return the entryDate. If there's a following (prior) entryDate, and the
+			 * selectedDate is after that second entryDate, or between the two entryDates,
+			 * return the first entryDate.
+			 */
+			for (int i = entryDates.size() - 1; i >= 0; i--) {
+				String entryDate1 = entryDates.get(i);
+				LocalDate date1 = LocalDate.parse(entryDate1, dateFormatter);
+				if (selectedDate.isAfter(date1)) {
+					return date1;
+				} else if ((i - 1) >= 0) {
+					String entryDate2 = entryDates.get(i - 1);
+					LocalDate date2 = LocalDate.parse(entryDate2, dateFormatter);
+					if (selectedDate.isAfter(date2) || (date2.isBefore(selectedDate) && date1.isAfter(selectedDate))) {
+						return date2; // previous entry
+					}
+				}
+			}
+		}
+		}
 		// fallback is same date
 		return selectedDate;
 	}
