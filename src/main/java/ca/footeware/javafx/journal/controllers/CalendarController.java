@@ -224,7 +224,7 @@ public class CalendarController extends VBox {
 		String formatted = selectedDate.format(App.dateFormatter);
 		try {
 			String entry = JournalManager.getEntry(formatted);
-			selectedEntry.setValue(entry != null ? entry : "");
+			selectedEntry.setValue(entry);
 		} catch (JournalException e) {
 			App.notify(e.getMessage());
 		}

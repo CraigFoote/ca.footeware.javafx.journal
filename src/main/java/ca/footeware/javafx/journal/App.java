@@ -28,10 +28,10 @@ public class App extends Application {
 	 * Formatter for dates to provide a {@link String} in format yyyy-MM-dd.
 	 */
 	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 	private static FXMLLoader loader;
 	private static NotificationPane notificationPane;
 	private static Scene scene;
+	private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 	/**
 	 * Return the window.
