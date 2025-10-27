@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 /**
  * MVC Controller for the "Editor" page.
@@ -42,6 +43,13 @@ public class EditorPageController {
 				calendarController = cController;
 				calendarWrapper.getChildren().add(calendar);
 				textArea.textProperty().bindBidirectional(calendarController.getSelectedEntry());
+				textArea.textProperty().addListener((_, _, _) -> {
+					String title = ((Stage) App.getPrimaryStage()).getTitle();
+					if (!title.startsWith("• ")) {
+						((Stage) App.getPrimaryStage()).setTitle("• " + title);
+					}
+				});
+
 			}
 		} catch (IOException e) {
 			App.notify(e.getMessage());
@@ -94,6 +102,10 @@ public class EditorPageController {
 			JournalManager.addEntry(formattedDate, textArea.getText());
 			JournalManager.saveJournal();
 			calendarController.colorizeEntryDays();
+			String title = ((Stage) App.getPrimaryStage()).getTitle();
+			if (title.startsWith("• ")) {
+				((Stage) App.getPrimaryStage()).setTitle(title.substring(2));
+			}
 			App.notify("Journal was saved.");
 		} catch (JournalException e) {
 			App.notify(e.getMessage());

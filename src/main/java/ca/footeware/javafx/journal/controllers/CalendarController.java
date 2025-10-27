@@ -187,8 +187,8 @@ public class CalendarController extends VBox {
 	@FXML
 	private void initialize() {
 		createDateGrid();
-		colorizeToday();
 		colorizeEntryDays();
+		colorizeToday();
 
 		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
 		monthLabel.setText(currentYearMonth.getMonth().toString());
