@@ -116,7 +116,7 @@ public class CalendarController extends VBox {
 			// if it's this year and month and label matches today's date
 			if (currentYearMonth.getYear() == now.getYear() && currentYearMonth.getMonth() == now.getMonth()
 					&& node instanceof Label label && label.getText().equals(String.valueOf(now.getDayOfMonth()))) {
-				label.setFont(Font.font(label.getFont().getFamily(), FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 18.0));
+				label.setFont(Font.font(label.getFont().getFamily(), FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 12.0));
 				label.getStyleClass().add("today");
 				return;
 			}
@@ -146,7 +146,7 @@ public class CalendarController extends VBox {
 			dayLabel.setOnMouseClicked(_ -> onDayLabelClicked(dayLabel));
 			dayLabel.setCursor(javafx.scene.Cursor.HAND);
 			dayLabel.setTextFill(Color.WHITE);
-			dayLabel.setFont(Font.font(dayLabel.getFont().getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, 18.0));
+			dayLabel.setFont(Font.font(dayLabel.getFont().getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, 12.0));
 			dayLabel.setPadding(new Insets(1, 10, 1, 10));
 
 			dateGrid.add(dayLabel, col, row);
