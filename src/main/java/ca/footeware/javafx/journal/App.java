@@ -80,7 +80,7 @@ public class App extends Application {
 
 	/**
 	 * Loads the provided FXML file and passes its parent root to the notification
-	 * pane to be set as child widget.
+	 * pane to be set as its child widget.
 	 *
 	 * @param fxml the name of the .fxml file without the extension.
 	 * @throws IOException if some other worlds collide

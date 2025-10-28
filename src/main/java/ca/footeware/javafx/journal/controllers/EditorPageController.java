@@ -8,6 +8,7 @@ import java.time.YearMonth;
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
 import ca.footeware.javafx.journal.model.JournalManager;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -74,14 +75,21 @@ public class EditorPageController {
 				// the textArea will display the selected entry from the calendar
 				textArea.textProperty().bindBidirectional(calendarController.getSelectedEntry());
 				// mark title dirty on text change
-				textArea.textProperty().addListener((_, oldValue, newValue) -> {
-					if (oldValue != null && newValue != null && !newValue.equals(oldValue)) {
-						setDirtyTitle();
+				textArea.textProperty().addListener((_, _, newValue) -> {
+					try {
+						String entry = JournalManager.getEntry(calendarController.getCurrentSelection());
+						if (newValue != null && !newValue.equals(entry) || (entry == null && newValue != null)
+								|| (entry != null && newValue == null)) {
+							setDirtyTitle();
+						}
+					} catch (JournalException e) {
+						App.notify(e.getMessage());
 					}
 				});
-
 			}
-		} catch (IOException e) {
+		} catch (
+
+		IOException e) {
 			App.notify(e.getMessage());
 		}
 	}
@@ -138,18 +146,34 @@ public class EditorPageController {
 
 	@FXML
 	private void onSaveAction() {
-		try {
-			LocalDate selectedDate = calendarController.getSelectedDate();
-			String formattedDate = selectedDate.format(App.dateFormatter);
-			JournalManager.addEntry(formattedDate, textArea.getText());
-			JournalManager.saveJournal();
-			calendarController.colorizeEntryDays();
-			clearDirtyTitle();
-			textArea.requestFocus();
-			App.notify("Journal was saved.");
-		} catch (JournalException e) {
-			App.notify(e.getMessage());
-		}
+		Task<Void> progressTask = new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				LocalDate selectedDate = calendarController.getSelectedDate();
+				updateProgress(2, 10);
+				String formattedDate = selectedDate.format(App.dateFormatter);
+				updateProgress(4, 10);
+				JournalManager.addEntry(formattedDate, textArea.getText());
+				updateProgress(6, 10);
+				JournalManager.saveJournal();
+				updateProgress(10, 10);
+				return null;
+			}
+
+			@Override
+			protected void succeeded() {
+				calendarController.colorizeEntryDays();
+				clearDirtyTitle();
+				textArea.requestFocus();
+				App.notify("Journal was saved.");
+				calendarController.progressBar.setVisible(false);
+			}
+		};
+		calendarController.progressBar.setVisible(true);
+		calendarController.progressBar.progressProperty().bind(progressTask.progressProperty());
+		var t = new Thread(progressTask);
+		t.setDaemon(true);
+		t.start();
 	}
 
 	@FXML

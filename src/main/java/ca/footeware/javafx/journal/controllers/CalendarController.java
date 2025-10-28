@@ -11,11 +11,13 @@ import ca.footeware.javafx.journal.exceptions.JournalException;
 import ca.footeware.javafx.journal.model.JournalManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -43,6 +45,9 @@ public class CalendarController extends VBox {
 
 	@FXML
 	private Label monthLabel;
+
+	@FXML
+	public ProgressBar progressBar;
 
 	private StringProperty selectedEntry;
 
@@ -166,6 +171,15 @@ public class CalendarController extends VBox {
 	}
 
 	/**
+	 * Get the currently selected day as a string.
+	 *
+	 * @return {@link String}
+	 */
+	public String getCurrentSelection() {
+		return currentSelection.getText();
+	}
+
+	/**
 	 * Gets the currently selected date.
 	 *
 	 * @return {@link LocalDate}
@@ -200,6 +214,27 @@ public class CalendarController extends VBox {
 			if (node instanceof Label label && label.getText().equals(today)) {
 				setBorder(label);
 				currentSelection = label;
+
+				Task<String> progressTask = new Task<String>() {
+					@Override
+					protected String call() throws Exception {
+						String entry = JournalManager.getEntry(today);
+						updateProgress(5, 10);
+						String value = new SimpleStringProperty(entry).getValue();
+						updateProgress(10, 10);
+						return value;
+					}
+
+					@Override
+					protected void succeeded() {
+						// No action needed on success for this task
+					}
+				};
+				progressBar.progressProperty().bind(progressTask.progressProperty());
+				var t = new Thread(progressTask);
+				t.setDaemon(true);
+				t.start();
+
 				try {
 					selectedEntry = new SimpleStringProperty(JournalManager.getEntry(today));
 					onDayLabelClicked(label);
