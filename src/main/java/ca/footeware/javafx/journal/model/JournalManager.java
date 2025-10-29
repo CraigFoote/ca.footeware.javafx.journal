@@ -19,6 +19,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
 
 /**
@@ -248,5 +249,22 @@ public class JournalManager {
 	 * Constructor, hidden because all methods are static.
 	 */
 	private JournalManager() {
+	}
+
+	/**
+	 * Gets the journal entry for provided date.
+	 * 
+	 * @param date {@link LocalDate}
+	 * @return {@link String}
+	 * @throws JournalException
+	 */
+	public static String getEntry(LocalDate date) throws JournalException {
+		String formatted = date.format(App.dateFormatter);
+		try {
+			return journal.getEntry(formatted);
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
+				| BadPaddingException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
+			throw new JournalException("Error fetching journal entry.", e);
+		}
 	}
 }

@@ -8,10 +8,12 @@ import java.time.YearMonth;
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
 import ca.footeware.javafx.journal.model.JournalManager;
+import ca.footeware.javafx.journal.model.SelectionEvent;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
@@ -35,7 +37,7 @@ public class EditorPageController {
 	 * Check if there are unsaved changes in the editor and prompt the user to save.
 	 */
 	private void checkEditorState() {
-		if (((Stage) App.getPrimaryStage()).getTitle().startsWith("• ")) {
+		if (isDirty()) {
 			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.setTitle("Unsaved Changes");
 			alert.setHeaderText("You have unsaved changes.");
@@ -76,6 +78,7 @@ public class EditorPageController {
 				textArea.textProperty().bindBidirectional(calendarController.getSelectedEntry());
 				// mark title dirty on text change
 				textArea.textProperty().addListener((_, _, newValue) -> {
+					// FIXME
 					try {
 						String entry = JournalManager.getEntry(calendarController.getCurrentSelection());
 						if (newValue != null && !newValue.equals(entry) || (entry == null && newValue != null)
@@ -86,12 +89,53 @@ public class EditorPageController {
 						App.notify(e.getMessage());
 					}
 				});
-			}
-		} catch (
+				// handle selection events
+				((Parent) loader.getRoot()).addEventHandler(SelectionEvent.DATE_SELECTED, event -> {
+					if (event instanceof SelectionEvent selectionEvent && isDirty()) {
+						handleSelectionEventWithChanges(selectionEvent);
+					}
 
-		IOException e) {
+				});
+			}
+		} catch (IOException e) {
 			App.notify(e.getMessage());
 		}
+	}
+
+	private boolean isDirty() {
+		String title = ((Stage) App.getPrimaryStage()).getTitle();
+		return title.startsWith("• ");
+	}
+
+	/**
+	 * Handle a selection event when there are unsaved changes.
+	 * 
+	 * @param selectionEvent {@link SelectionEvent}
+	 */
+	private void handleSelectionEventWithChanges(SelectionEvent selectionEvent) {
+		Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+		alert.setTitle("Unsaved Changes");
+		alert.setHeaderText("You have unsaved changes.");
+		alert.setContentText("Would you like to save them?");
+		ButtonType yesButton = new ButtonType("Yes", ButtonType.YES.getButtonData());
+		ButtonType noButton = new ButtonType("No", ButtonType.NO.getButtonData());
+		alert.getButtonTypes().setAll(yesButton, noButton);
+		alert.showAndWait().ifPresent(response -> {
+			if (response == yesButton) {
+				LocalDate oldSelectedDate = selectionEvent.getOldDate();
+				String oldEntry = selectionEvent.getOldEntry();
+				try {
+					System.out.println("Saving entry for " + oldSelectedDate.format(App.dateFormatter));
+					JournalManager.addEntry(oldSelectedDate.format(App.dateFormatter), oldEntry);
+					JournalManager.saveJournal();
+					calendarController.colorizeEntryDays();
+					clearDirtyTitle();
+					textArea.requestFocus();
+				} catch (JournalException e) {
+					App.notify(e.getMessage());
+				}
+			}
+		});
 	}
 
 	@FXML

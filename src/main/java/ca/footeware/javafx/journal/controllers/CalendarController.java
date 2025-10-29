@@ -9,6 +9,7 @@ import java.util.List;
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
 import ca.footeware.javafx.journal.model.JournalManager;
+import ca.footeware.javafx.journal.model.SelectionEvent;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
@@ -143,13 +144,40 @@ public class CalendarController extends VBox {
 			final Label dayLabel = new Label(Integer.toString(day));
 			GridPane.setHalignment(dayLabel, HPos.CENTER);
 
-			dayLabel.setOnMouseClicked(_ -> onDayLabelClicked(dayLabel));
+			dayLabel.setOnMouseClicked(_ -> {
+				fireSelectionEvent(dayLabel);
+			});
 			dayLabel.setCursor(javafx.scene.Cursor.HAND);
 			dayLabel.setTextFill(Color.WHITE);
 			dayLabel.setFont(Font.font(dayLabel.getFont().getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, 12.0));
 			dayLabel.setPadding(new Insets(1, 10, 1, 10));
 
 			dateGrid.add(dayLabel, col, row);
+		}
+	}
+
+	/**
+	 * Creates and fires a selection event.
+	 * 
+	 * @param label {@link Label} the originating control
+	 */
+	private void fireSelectionEvent(Label label) {
+		try {
+			LocalDate oldSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
+					Integer.parseInt(currentSelection.getText()));
+			String oldEntry = JournalManager.getEntry(oldSelectedDate);
+
+			onDayLabelClicked(label);
+
+			LocalDate newSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
+					Integer.parseInt(currentSelection.getText()));
+			String newEntry = JournalManager.getEntry(newSelectedDate);
+
+			SelectionEvent selectionEvent = new SelectionEvent(SelectionEvent.DATE_SELECTED, oldSelectedDate, oldEntry,
+					newSelectedDate, newEntry);
+			label.fireEvent(selectionEvent);
+		} catch (JournalException e) {
+			App.notify(e.getMessage());
 		}
 	}
 

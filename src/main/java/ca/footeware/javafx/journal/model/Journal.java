@@ -71,7 +71,7 @@ public class Journal {
 	public void addEntry(String key, String value)
 			throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException,
 			BadPaddingException, InvalidAlgorithmParameterException, InvalidKeySpecException {
-		if (value.isBlank()) {
+		if (value == null || value.isBlank()) {
 			map.remove(key);
 		} else {
 			String encrypted = Superstar.encrypt(value, password);
