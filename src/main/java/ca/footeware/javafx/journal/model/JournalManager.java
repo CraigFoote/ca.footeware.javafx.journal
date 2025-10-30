@@ -68,6 +68,23 @@ public class JournalManager {
 	}
 
 	/**
+	 * Gets the journal entry for provided date.
+	 * 
+	 * @param date {@link LocalDate}
+	 * @return {@link String}
+	 * @throws JournalException
+	 */
+	public static String getEntry(LocalDate date) throws JournalException {
+		String formatted = date.format(App.dateFormatter);
+		try {
+			return journal.getEntry(formatted);
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
+				| BadPaddingException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
+			throw new JournalException("Error fetching journal entry.", e);
+		}
+	}
+
+	/**
 	 * Get a day's journal entry.
 	 *
 	 * @param formattedDate {@link String} in format yyyy-MM-dd.
@@ -249,22 +266,5 @@ public class JournalManager {
 	 * Constructor, hidden because all methods are static.
 	 */
 	private JournalManager() {
-	}
-
-	/**
-	 * Gets the journal entry for provided date.
-	 * 
-	 * @param date {@link LocalDate}
-	 * @return {@link String}
-	 * @throws JournalException
-	 */
-	public static String getEntry(LocalDate date) throws JournalException {
-		String formatted = date.format(App.dateFormatter);
-		try {
-			return journal.getEntry(formatted);
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
-				| BadPaddingException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
-			throw new JournalException("Error fetching journal entry.", e);
-		}
 	}
 }

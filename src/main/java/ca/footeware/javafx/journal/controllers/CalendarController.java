@@ -8,14 +8,17 @@ import java.util.List;
 
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
+import ca.footeware.javafx.journal.model.DateSelection;
 import ca.footeware.javafx.journal.model.JournalManager;
 import ca.footeware.javafx.journal.model.SelectionEvent;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -38,7 +41,7 @@ import javafx.scene.text.FontWeight;
  */
 public class CalendarController extends VBox {
 
-	private Label currentSelection;
+	private DateSelection currentSelection;
 	private YearMonth currentYearMonth;
 
 	@FXML
@@ -50,7 +53,7 @@ public class CalendarController extends VBox {
 	@FXML
 	public ProgressBar progressBar;
 
-	private StringProperty selectedEntry;
+	private ObjectProperty<DateSelection> selectedEntry;
 
 	@FXML
 	private Label yearLabel;
@@ -144,40 +147,13 @@ public class CalendarController extends VBox {
 			final Label dayLabel = new Label(Integer.toString(day));
 			GridPane.setHalignment(dayLabel, HPos.CENTER);
 
-			dayLabel.setOnMouseClicked(_ -> {
-				fireSelectionEvent(dayLabel);
-			});
-			dayLabel.setCursor(javafx.scene.Cursor.HAND);
+			dayLabel.setOnMouseClicked(_ -> fireSelectionEvent(dayLabel));
+			dayLabel.setCursor(Cursor.HAND);
 			dayLabel.setTextFill(Color.WHITE);
 			dayLabel.setFont(Font.font(dayLabel.getFont().getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, 12.0));
 			dayLabel.setPadding(new Insets(1, 10, 1, 10));
 
 			dateGrid.add(dayLabel, col, row);
-		}
-	}
-
-	/**
-	 * Creates and fires a selection event.
-	 * 
-	 * @param label {@link Label} the originating control
-	 */
-	private void fireSelectionEvent(Label label) {
-		try {
-			LocalDate oldSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
-					Integer.parseInt(currentSelection.getText()));
-			String oldEntry = JournalManager.getEntry(oldSelectedDate);
-
-			onDayLabelClicked(label);
-
-			LocalDate newSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
-					Integer.parseInt(currentSelection.getText()));
-			String newEntry = JournalManager.getEntry(newSelectedDate);
-
-			SelectionEvent selectionEvent = new SelectionEvent(SelectionEvent.DATE_SELECTED, oldSelectedDate, oldEntry,
-					newSelectedDate, newEntry);
-			label.fireEvent(selectionEvent);
-		} catch (JournalException e) {
-			App.notify(e.getMessage());
 		}
 	}
 
@@ -195,7 +171,44 @@ public class CalendarController extends VBox {
 		colorizeToday();
 		colorizeEntryDays();
 
-		selectedEntry.setValue("");
+		selectedEntry.setValue(null);
+	}
+
+	/**
+	 * Creates and fires a selection event.
+	 * 
+	 * @param label {@link Label} the originating control
+	 */
+	private void fireSelectionEvent(Label label) {
+		try {
+			// last event - may be used to save previous selection
+			LocalDate oldSelectedDate = null;
+			String oldEntry = null;
+			if (currentSelection != null) {
+				oldSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
+						currentSelection.oldDate().getDayOfMonth());
+				oldEntry = JournalManager.getEntry(oldSelectedDate);
+			}
+
+			// trigger state update
+			onDayLabelClicked(label);
+
+			// new event
+			LocalDate newSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
+					currentSelection.newDate().getDayOfMonth());
+			String newEntry = JournalManager.getEntry(newSelectedDate);
+
+			// selection object
+			DateSelection dateSelection = new DateSelection(oldSelectedDate, newSelectedDate, oldEntry, newEntry,
+					label);
+
+			// fire event
+			SelectionEvent selectionEvent = new SelectionEvent(SelectionEvent.DATE_SELECTED, dateSelection);
+			currentSelection = dateSelection;
+			label.fireEvent(selectionEvent);
+		} catch (JournalException e) {
+			App.notify(e.getMessage());
+		}
 	}
 
 	/**
@@ -203,8 +216,8 @@ public class CalendarController extends VBox {
 	 *
 	 * @return {@link String}
 	 */
-	public String getCurrentSelection() {
-		return currentSelection.getText();
+	public DateSelection getCurrentSelection() {
+		return currentSelection;
 	}
 
 	/**
@@ -214,7 +227,7 @@ public class CalendarController extends VBox {
 	 */
 	public LocalDate getSelectedDate() {
 		return LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
-				Integer.parseInt(currentSelection.getText()));
+				currentSelection.newDate().getDayOfMonth());
 	}
 
 	/**
@@ -222,7 +235,7 @@ public class CalendarController extends VBox {
 	 *
 	 * @return {@link StringProperty} the selected day's entry
 	 */
-	public StringProperty getSelectedEntry() {
+	public ObjectProperty<DateSelection> getSelectedEntry() {
 		return selectedEntry;
 	}
 
@@ -237,38 +250,42 @@ public class CalendarController extends VBox {
 
 		// select today by default
 		LocalDate now = LocalDate.now();
+		int dayOfMonth = now.getDayOfMonth();
+		String dayOfMonthStr = String.valueOf(dayOfMonth);
 		for (Node node : dateGrid.getChildren()) {
-			String today = String.valueOf(now.getDayOfMonth());
-			if (node instanceof Label label && label.getText().equals(today)) {
+			if (node instanceof Label label && label.getText().equals(dayOfMonthStr)) {
+				// we found the day of the month
 				setBorder(label);
-				currentSelection = label;
+				selectDayOfMonth(dayOfMonth);
 
-				Task<String> progressTask = new Task<String>() {
+				Task<DateSelection> selectionTask = new Task<DateSelection>() {
 					@Override
-					protected String call() throws Exception {
-						String entry = JournalManager.getEntry(today);
-						updateProgress(5, 10);
-						String value = new SimpleStringProperty(entry).getValue();
+					protected DateSelection call() throws Exception {
+						String entry = JournalManager.getEntry(now);
+						updateProgress(3, 10);
+						currentSelection = new DateSelection(null, now, null, entry, label);
+						updateProgress(6, 10);
+						DateSelection dateSelection = new SimpleObjectProperty<DateSelection>(currentSelection)
+								.getValue();
 						updateProgress(10, 10);
-						return value;
+						return dateSelection;
 					}
 
 					@Override
 					protected void succeeded() {
-						// No action needed on success for this task
+						currentSelection = getValue();
+						System.err.println("calendarController.init, currentSelection=" + currentSelection);
+						DateSelection newDateSelection = new DateSelection(null, now, null, currentSelection.newEntry(),
+								label);
+						selectedEntry = new SimpleObjectProperty<>(newDateSelection);
+						onDayLabelClicked(label);
 					}
 				};
-				progressBar.progressProperty().bind(progressTask.progressProperty());
-				var t = new Thread(progressTask);
+				progressBar.progressProperty().bind(selectionTask.progressProperty());
+				var t = new Thread(selectionTask);
 				t.setDaemon(true);
 				t.start();
 
-				try {
-					selectedEntry = new SimpleStringProperty(JournalManager.getEntry(today));
-					onDayLabelClicked(label);
-				} catch (JournalException e) {
-					App.notify(e.getMessage());
-				}
 				break;
 			}
 		}
@@ -280,17 +297,8 @@ public class CalendarController extends VBox {
 	 * @param label {@link Label} the clicked day's label
 	 */
 	void onDayLabelClicked(Label label) {
-		currentSelection = label;
 		clearBorders();
 		setBorder(label);
-		LocalDate selectedDate = currentYearMonth.atDay(Integer.parseInt(currentSelection.getText()));
-		String formatted = selectedDate.format(App.dateFormatter);
-		try {
-			String entry = JournalManager.getEntry(formatted);
-			selectedEntry.setValue(entry);
-		} catch (JournalException e) {
-			App.notify(e.getMessage());
-		}
 	}
 
 	@FXML

@@ -7,9 +7,12 @@ import java.time.YearMonth;
 
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
+import ca.footeware.javafx.journal.model.DateSelection;
 import ca.footeware.javafx.journal.model.JournalManager;
 import ca.footeware.javafx.journal.model.SelectionEvent;
+import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Task;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -75,27 +78,12 @@ public class EditorPageController {
 				calendarController = cController;
 				calendarWrapper.getChildren().add(calendar);
 				// the textArea will display the selected entry from the calendar
-				textArea.textProperty().bindBidirectional(calendarController.getSelectedEntry());
+				ObjectProperty<DateSelection> selectedEntry = calendarController.getSelectedEntry();
+				textArea.textProperty().bindBidirectional(selectedEntry.getValue().getNewEntryProperty());
 				// mark title dirty on text change
-				textArea.textProperty().addListener((_, _, newValue) -> {
-					// FIXME
-					try {
-						String entry = JournalManager.getEntry(calendarController.getCurrentSelection());
-						if (newValue != null && !newValue.equals(entry) || (entry == null && newValue != null)
-								|| (entry != null && newValue == null)) {
-							setDirtyTitle();
-						}
-					} catch (JournalException e) {
-						App.notify(e.getMessage());
-					}
-				});
+				textArea.textProperty().addListener((_, oldValue, newValue) -> onTextChanged(oldValue, newValue));
 				// handle selection events
-				((Parent) loader.getRoot()).addEventHandler(SelectionEvent.DATE_SELECTED, event -> {
-					if (event instanceof SelectionEvent selectionEvent && isDirty()) {
-						handleSelectionEventWithChanges(selectionEvent);
-					}
-
-				});
+				((Parent) loader.getRoot()).addEventHandler(SelectionEvent.DATE_SELECTED, this::onSelectionEvent);
 			}
 		} catch (IOException e) {
 			App.notify(e.getMessage());
@@ -105,37 +93,6 @@ public class EditorPageController {
 	private boolean isDirty() {
 		String title = ((Stage) App.getPrimaryStage()).getTitle();
 		return title.startsWith("• ");
-	}
-
-	/**
-	 * Handle a selection event when there are unsaved changes.
-	 * 
-	 * @param selectionEvent {@link SelectionEvent}
-	 */
-	private void handleSelectionEventWithChanges(SelectionEvent selectionEvent) {
-		Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-		alert.setTitle("Unsaved Changes");
-		alert.setHeaderText("You have unsaved changes.");
-		alert.setContentText("Would you like to save them?");
-		ButtonType yesButton = new ButtonType("Yes", ButtonType.YES.getButtonData());
-		ButtonType noButton = new ButtonType("No", ButtonType.NO.getButtonData());
-		alert.getButtonTypes().setAll(yesButton, noButton);
-		alert.showAndWait().ifPresent(response -> {
-			if (response == yesButton) {
-				LocalDate oldSelectedDate = selectionEvent.getOldDate();
-				String oldEntry = selectionEvent.getOldEntry();
-				try {
-					System.out.println("Saving entry for " + oldSelectedDate.format(App.dateFormatter));
-					JournalManager.addEntry(oldSelectedDate.format(App.dateFormatter), oldEntry);
-					JournalManager.saveJournal();
-					calendarController.colorizeEntryDays();
-					clearDirtyTitle();
-					textArea.requestFocus();
-				} catch (JournalException e) {
-					App.notify(e.getMessage());
-				}
-			}
-		});
 	}
 
 	@FXML
@@ -218,6 +175,55 @@ public class EditorPageController {
 		var t = new Thread(progressTask);
 		t.setDaemon(true);
 		t.start();
+	}
+
+	/**
+	 * Handle a selection event.
+	 * 
+	 * @param Event {@link Event}
+	 */
+	private void onSelectionEvent(Event event) {
+		if (event instanceof SelectionEvent selectionEvent && isDirty()) {
+			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+			alert.setTitle("Unsaved Changes");
+			alert.setHeaderText("You have unsaved changes.");
+			alert.setContentText("Would you like to save them?");
+			ButtonType yesButton = new ButtonType("Yes", ButtonType.YES.getButtonData());
+			ButtonType noButton = new ButtonType("No", ButtonType.NO.getButtonData());
+			alert.getButtonTypes().setAll(yesButton, noButton);
+			alert.showAndWait().ifPresent(response -> {
+				if (response == yesButton) {
+					DateSelection selection = selectionEvent.getSelection();
+					LocalDate oldSelectedDate = selection.oldDate();
+					String oldEntry = selection.oldEntry();
+					try {
+						JournalManager.addEntry(oldSelectedDate.format(App.dateFormatter), oldEntry);
+						JournalManager.saveJournal();
+						calendarController.colorizeEntryDays();
+						clearDirtyTitle();
+						textArea.requestFocus();
+					} catch (JournalException e) {
+						App.notify(e.getMessage());
+					}
+				}
+			});
+		}
+	}
+
+	private void onTextChanged(String oldValue, String newValue) {
+		System.err.println("\n editorPage onTextChanged");
+		System.err.println("\toldValue: " + oldValue);
+		System.err.println("\tnewValue: " + newValue);
+		try {
+			DateSelection currentSelection = calendarController.getCurrentSelection();
+			String entry = JournalManager.getEntry(currentSelection.newDate());
+			if ((newValue != null && !newValue.equals(entry)) || (entry != null && newValue == null)) {
+				System.err.println("\tdirty");
+				setDirtyTitle();
+			}
+		} catch (JournalException e) {
+			App.notify(e.getMessage());
+		}
 	}
 
 	@FXML
