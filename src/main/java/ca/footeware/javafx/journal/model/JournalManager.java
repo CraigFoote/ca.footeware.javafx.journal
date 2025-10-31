@@ -10,7 +10,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ import ca.footeware.javafx.journal.exceptions.JournalException;
  */
 public class JournalManager {
 
-	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private static Journal journal;
 
 	/**
@@ -122,7 +120,7 @@ public class JournalManager {
 	public static LocalDate getFirstEntryDate() {
 		List<String> entryDates = getEntryDates();
 		if (!entryDates.isEmpty()) {
-			return LocalDate.parse(entryDates.get(0), dateFormatter);
+			return LocalDate.parse(entryDates.get(0), App.dateFormatter);
 		}
 		return null;
 	}
@@ -136,7 +134,7 @@ public class JournalManager {
 		List<String> entryDates = getEntryDates();
 		if (!entryDates.isEmpty()) {
 			String formattedDate = entryDates.get(entryDates.size() - 1);
-			return LocalDate.parse(formattedDate, dateFormatter);
+			return LocalDate.parse(formattedDate, App.dateFormatter);
 		}
 		return null;
 	}
@@ -154,7 +152,7 @@ public class JournalManager {
 			return selectedDate;
 		}
 		case 1 -> {
-			LocalDate entryDate = LocalDate.parse(entryDates.get(0), dateFormatter);
+			LocalDate entryDate = LocalDate.parse(entryDates.get(0), App.dateFormatter);
 			return entryDate.isAfter(selectedDate) ? entryDate : selectedDate;
 		}
 		default -> {
@@ -166,12 +164,12 @@ public class JournalManager {
 			 */
 			for (int i = 0; i < entryDates.size(); i++) {
 				String entryDate1 = entryDates.get(i);
-				LocalDate date1 = LocalDate.parse(entryDate1, dateFormatter);
+				LocalDate date1 = LocalDate.parse(entryDate1, App.dateFormatter);
 				if (selectedDate.isBefore(date1)) {
 					return date1;
 				} else if ((i + 1) < entryDates.size()) {
 					String entryDate2 = entryDates.get(i + 1);
-					LocalDate date2 = LocalDate.parse(entryDate2, dateFormatter);
+					LocalDate date2 = LocalDate.parse(entryDate2, App.dateFormatter);
 					if (date1.isEqual(selectedDate) || (date1.isBefore(selectedDate) && date2.isAfter(selectedDate))) {
 						return date2; // next entry
 					}
@@ -197,7 +195,7 @@ public class JournalManager {
 			return selectedDate;
 		}
 		case 1 -> {
-			LocalDate entryDate = LocalDate.parse(entryDates.get(0), dateFormatter);
+			LocalDate entryDate = LocalDate.parse(entryDates.get(0), App.dateFormatter);
 			return entryDate.isBefore(selectedDate) ? entryDate : selectedDate;
 		}
 		default -> {
@@ -209,12 +207,12 @@ public class JournalManager {
 			 */
 			for (int i = entryDates.size() - 1; i >= 0; i--) {
 				String entryDate1 = entryDates.get(i);
-				LocalDate date1 = LocalDate.parse(entryDate1, dateFormatter);
+				LocalDate date1 = LocalDate.parse(entryDate1, App.dateFormatter);
 				if (selectedDate.isAfter(date1)) {
 					return date1;
 				} else if ((i - 1) >= 0) {
 					String entryDate2 = entryDates.get(i - 1);
-					LocalDate date2 = LocalDate.parse(entryDate2, dateFormatter);
+					LocalDate date2 = LocalDate.parse(entryDate2, App.dateFormatter);
 					if (selectedDate.isAfter(date2) || (date2.isBefore(selectedDate) && date1.isAfter(selectedDate))) {
 						return date2; // previous entry
 					}

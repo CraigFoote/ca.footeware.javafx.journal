@@ -11,9 +11,6 @@ import ca.footeware.javafx.journal.exceptions.JournalException;
 import ca.footeware.javafx.journal.model.DateSelection;
 import ca.footeware.javafx.journal.model.JournalManager;
 import ca.footeware.javafx.journal.model.SelectionEvent;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -41,7 +38,41 @@ import javafx.scene.text.FontWeight;
  */
 public class CalendarController extends VBox {
 
+	/**
+	 * Fetches the {@link String} journal entry for the provided {@link LocalDate}
+	 * and sets it as {@link CalendarController#currentSelection}.
+	 */
+	private class FetchEntryTask extends Task<String> {
+
+		private LocalDate date;
+
+		/**
+		 * Constructor.
+		 * 
+		 * @param date {@link LocalDate}
+		 */
+		public FetchEntryTask(LocalDate date) {
+			this.date = date;
+		}
+
+		@Override
+		protected String call() throws Exception {
+			updateProgress(1, 2);
+			String entry = JournalManager.getEntry(date);
+			updateProgress(2, 2);
+			return entry;
+		}
+
+		@Override
+		protected void succeeded() {
+			currentSelection = new DateSelection(null, date, null, getValue());
+			selectDayOfMonth(date.getDayOfMonth());
+			progressBar.setVisible(false);
+		}
+	}
+
 	private DateSelection currentSelection;
+
 	private YearMonth currentYearMonth;
 
 	@FXML
@@ -52,8 +83,6 @@ public class CalendarController extends VBox {
 
 	@FXML
 	public ProgressBar progressBar;
-
-	private ObjectProperty<DateSelection> selectedEntry;
 
 	@FXML
 	private Label yearLabel;
@@ -170,8 +199,6 @@ public class CalendarController extends VBox {
 		createDateGrid();
 		colorizeToday();
 		colorizeEntryDays();
-
-		selectedEntry.setValue(null);
 	}
 
 	/**
@@ -184,7 +211,7 @@ public class CalendarController extends VBox {
 			// last event - may be used to save previous selection
 			LocalDate oldSelectedDate = null;
 			String oldEntry = null;
-			if (currentSelection != null) {
+			if (currentSelection != null && currentSelection.oldDate() != null) {
 				oldSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
 						currentSelection.oldDate().getDayOfMonth());
 				oldEntry = JournalManager.getEntry(oldSelectedDate);
@@ -199,12 +226,10 @@ public class CalendarController extends VBox {
 			String newEntry = JournalManager.getEntry(newSelectedDate);
 
 			// selection object
-			DateSelection dateSelection = new DateSelection(oldSelectedDate, newSelectedDate, oldEntry, newEntry,
-					label);
+			currentSelection = new DateSelection(oldSelectedDate, newSelectedDate, oldEntry, newEntry);
 
 			// fire event
-			SelectionEvent selectionEvent = new SelectionEvent(SelectionEvent.DATE_SELECTED, dateSelection);
-			currentSelection = dateSelection;
+			SelectionEvent selectionEvent = new SelectionEvent(SelectionEvent.DATE_SELECTED, currentSelection);
 			label.fireEvent(selectionEvent);
 		} catch (JournalException e) {
 			App.notify(e.getMessage());
@@ -230,15 +255,6 @@ public class CalendarController extends VBox {
 				currentSelection.newDate().getDayOfMonth());
 	}
 
-	/**
-	 * Get the currently selected day's entry.
-	 *
-	 * @return {@link StringProperty} the selected day's entry
-	 */
-	public ObjectProperty<DateSelection> getSelectedEntry() {
-		return selectedEntry;
-	}
-
 	@FXML
 	private void initialize() {
 		createDateGrid();
@@ -258,34 +274,12 @@ public class CalendarController extends VBox {
 				setBorder(label);
 				selectDayOfMonth(dayOfMonth);
 
-				Task<DateSelection> selectionTask = new Task<DateSelection>() {
-					@Override
-					protected DateSelection call() throws Exception {
-						String entry = JournalManager.getEntry(now);
-						updateProgress(3, 10);
-						currentSelection = new DateSelection(null, now, null, entry, label);
-						updateProgress(6, 10);
-						DateSelection dateSelection = new SimpleObjectProperty<DateSelection>(currentSelection)
-								.getValue();
-						updateProgress(10, 10);
-						return dateSelection;
-					}
-
-					@Override
-					protected void succeeded() {
-						currentSelection = getValue();
-						System.err.println("calendarController.init, currentSelection=" + currentSelection);
-						DateSelection newDateSelection = new DateSelection(null, now, null, currentSelection.newEntry(),
-								label);
-						selectedEntry = new SimpleObjectProperty<>(newDateSelection);
-						onDayLabelClicked(label);
-					}
-				};
-				progressBar.progressProperty().bind(selectionTask.progressProperty());
-				var t = new Thread(selectionTask);
+				Task<String> fetchEntryTask = new FetchEntryTask(now);
+				progressBar.progressProperty().bind(fetchEntryTask.progressProperty());
+				var t = new Thread(fetchEntryTask);
 				t.setDaemon(true);
 				t.start();
-
+				
 				break;
 			}
 		}
@@ -297,8 +291,9 @@ public class CalendarController extends VBox {
 	 * @param label {@link Label} the clicked day's label
 	 */
 	void onDayLabelClicked(Label label) {
-		clearBorders();
 		setBorder(label);
+		SelectionEvent event = new SelectionEvent(SelectionEvent.DATE_SELECTED, currentSelection);
+		label.fireEvent(event);
 	}
 
 	@FXML
@@ -337,7 +332,7 @@ public class CalendarController extends VBox {
 	 * @param today int the day of the month to select
 	 */
 	public void selectDayOfMonth(int day) {
-		Node node = dateGrid.getChildrenUnmodifiable().get(day);
+		Node node = dateGrid.getChildrenUnmodifiable().get(day - 1);
 		if (node instanceof Label label) {
 			onDayLabelClicked(label);
 		}
@@ -349,6 +344,7 @@ public class CalendarController extends VBox {
 	 * @param label {@link Label}
 	 */
 	private void setBorder(Label label) {
+		clearBorders();
 		label.setBorder(new Border(
 				new BorderStroke(Color.BURLYWOOD, BorderStrokeStyle.SOLID, new CornerRadii(5), new BorderWidths(3))));
 	}

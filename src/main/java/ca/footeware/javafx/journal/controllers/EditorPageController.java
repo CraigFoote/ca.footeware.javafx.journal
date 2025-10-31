@@ -10,7 +10,6 @@ import ca.footeware.javafx.journal.exceptions.JournalException;
 import ca.footeware.javafx.journal.model.DateSelection;
 import ca.footeware.javafx.journal.model.JournalManager;
 import ca.footeware.javafx.journal.model.SelectionEvent;
-import javafx.beans.property.ObjectProperty;
 import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -77,11 +76,14 @@ public class EditorPageController {
 			if (object instanceof CalendarController cController) {
 				calendarController = cController;
 				calendarWrapper.getChildren().add(calendar);
-				// the textArea will display the selected entry from the calendar
-				ObjectProperty<DateSelection> selectedEntry = calendarController.getSelectedEntry();
-				textArea.textProperty().bindBidirectional(selectedEntry.getValue().getNewEntryProperty());
+
+				// Listen for date selection events and update textArea
+				calendar.addEventHandler(SelectionEvent.DATE_SELECTED,
+						event -> textArea.setText(event.getSelection().newEntry()));
+
 				// mark title dirty on text change
 				textArea.textProperty().addListener((_, oldValue, newValue) -> onTextChanged(oldValue, newValue));
+
 				// handle selection events
 				((Parent) loader.getRoot()).addEventHandler(SelectionEvent.DATE_SELECTED, this::onSelectionEvent);
 			}
@@ -147,15 +149,17 @@ public class EditorPageController {
 
 	@FXML
 	private void onSaveAction() {
-		Task<Void> progressTask = new Task<Void>() {
+		Task<Void> saveTask = new Task<Void>() {
 			@Override
 			protected Void call() throws Exception {
-				LocalDate selectedDate = calendarController.getSelectedDate();
 				updateProgress(2, 10);
-				String formattedDate = selectedDate.format(App.dateFormatter);
+				calendarController.progressBar.setVisible(true);
+				LocalDate selectedDate = calendarController.getSelectedDate();
 				updateProgress(4, 10);
-				JournalManager.addEntry(formattedDate, textArea.getText());
+				String formattedDate = selectedDate.format(App.dateFormatter);
 				updateProgress(6, 10);
+				JournalManager.addEntry(formattedDate, textArea.getText());
+				updateProgress(8, 10);
 				JournalManager.saveJournal();
 				updateProgress(10, 10);
 				return null;
@@ -170,9 +174,8 @@ public class EditorPageController {
 				calendarController.progressBar.setVisible(false);
 			}
 		};
-		calendarController.progressBar.setVisible(true);
-		calendarController.progressBar.progressProperty().bind(progressTask.progressProperty());
-		var t = new Thread(progressTask);
+		calendarController.progressBar.progressProperty().bind(saveTask.progressProperty());
+		var t = new Thread(saveTask);
 		t.setDaemon(true);
 		t.start();
 	}
