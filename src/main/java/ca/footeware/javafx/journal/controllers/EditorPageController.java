@@ -15,7 +15,6 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
@@ -72,21 +71,20 @@ public class EditorPageController {
 		try {
 			FXMLLoader loader = new FXMLLoader(resource);
 			calendar = loader.load();
+
+			// Listen for date selection events and update textArea
+			calendar.addEventHandler(SelectionEvent.DATE_SELECTED, this::onSelectionEvent);
+
 			Object object = loader.getController();
 			if (object instanceof CalendarController cController) {
 				calendarController = cController;
 				calendarWrapper.getChildren().add(calendar);
 
-				// Listen for date selection events and update textArea
-				calendar.addEventHandler(SelectionEvent.DATE_SELECTED,
-						event -> textArea.setText(event.getSelection().newEntry()));
-
-				// mark title dirty on text change
-				textArea.textProperty().addListener((_, oldValue, newValue) -> onTextChanged(oldValue, newValue));
-
-				// handle selection events
-				((Parent) loader.getRoot()).addEventHandler(SelectionEvent.DATE_SELECTED, this::onSelectionEvent);
+				calendarController.selectDayOfMonth(LocalDate.now().getDayOfMonth());
 			}
+
+			// mark title dirty on text change
+			textArea.textProperty().addListener((_, oldValue, newValue) -> onTextChanged(oldValue, newValue));
 		} catch (IOException e) {
 			App.notify(e.getMessage());
 		}
@@ -186,30 +184,45 @@ public class EditorPageController {
 	 * @param Event {@link Event}
 	 */
 	private void onSelectionEvent(Event event) {
-		if (event instanceof SelectionEvent selectionEvent && isDirty()) {
-			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-			alert.setTitle("Unsaved Changes");
-			alert.setHeaderText("You have unsaved changes.");
-			alert.setContentText("Would you like to save them?");
-			ButtonType yesButton = new ButtonType("Yes", ButtonType.YES.getButtonData());
-			ButtonType noButton = new ButtonType("No", ButtonType.NO.getButtonData());
-			alert.getButtonTypes().setAll(yesButton, noButton);
-			alert.showAndWait().ifPresent(response -> {
-				if (response == yesButton) {
-					DateSelection selection = selectionEvent.getSelection();
-					LocalDate oldSelectedDate = selection.oldDate();
-					String oldEntry = selection.oldEntry();
-					try {
-						JournalManager.addEntry(oldSelectedDate.format(App.dateFormatter), oldEntry);
-						JournalManager.saveJournal();
-						calendarController.colorizeEntryDays();
+		System.err.println("\nonSelectionEvent");
+		if (event instanceof SelectionEvent selectionEvent) {
+			if (isDirty()) {
+				Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+				alert.setTitle("Unsaved Changes");
+				alert.setHeaderText("You have unsaved changes.");
+				alert.setContentText("Would you like to save them?");
+				ButtonType yesButton = new ButtonType("Yes", ButtonType.YES.getButtonData());
+				ButtonType noButton = new ButtonType("No", ButtonType.NO.getButtonData());
+				alert.getButtonTypes().setAll(yesButton, noButton);
+				alert.showAndWait().ifPresent(response -> {
+					if (response == yesButton) {
+						DateSelection selection = selectionEvent.getSelection();
+						LocalDate oldSelectedDate = selection.oldDate();
+						String oldEntry = textArea.getText();
+						try {
+							JournalManager.addEntry(oldSelectedDate.format(App.dateFormatter), oldEntry);
+							JournalManager.saveJournal();
+							calendarController.colorizeEntryDays();
+							clearDirtyTitle();
+							textArea.requestFocus();
+						} catch (JournalException e) {
+							App.notify(e.getMessage());
+						}
+					} else {
+						// user pressed no - clear the dirty indicator
 						clearDirtyTitle();
 						textArea.requestFocus();
-					} catch (JournalException e) {
-						App.notify(e.getMessage());
 					}
+				});
+			} else {
+				LocalDate newDate = selectionEvent.getSelection().newDate();
+				try {
+					String entry = JournalManager.getEntry(newDate);
+					textArea.setText(entry);
+				} catch (JournalException e) {
+					App.notify(e.getMessage());
 				}
-			});
+			}
 		}
 	}
 
@@ -217,9 +230,10 @@ public class EditorPageController {
 		System.err.println("\n editorPage onTextChanged");
 		System.err.println("\toldValue: " + oldValue);
 		System.err.println("\tnewValue: " + newValue);
+		LocalDate currentDate = calendarController.getCurrentSelection().newDate();
 		try {
-			DateSelection currentSelection = calendarController.getCurrentSelection();
-			String entry = JournalManager.getEntry(currentSelection.newDate());
+			String entry = JournalManager.getEntry(currentDate);
+			System.err.println("\tentry: " + entry);
 			if ((newValue != null && !newValue.equals(entry)) || (entry != null && newValue == null)) {
 				System.err.println("\tdirty");
 				setDirtyTitle();
@@ -233,7 +247,7 @@ public class EditorPageController {
 	private void onTodayAction() {
 		checkEditorState();
 		calendarController.drawMonth(YearMonth.now());
-		int today = LocalDate.now().getDayOfMonth() - 1;
+		int today = LocalDate.now().getDayOfMonth();
 		calendarController.selectDayOfMonth(today);
 		clearDirtyTitle();
 		textArea.requestFocus();
