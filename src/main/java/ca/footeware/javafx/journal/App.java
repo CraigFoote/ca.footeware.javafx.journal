@@ -13,9 +13,13 @@ import org.controlsfx.control.NotificationPane;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -28,6 +32,7 @@ public class App extends Application {
 	 * Formatter for dates to provide a {@link String} in format yyyy-MM-dd.
 	 */
 	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	public static ProgressBar progressBar;
 	private static FXMLLoader loader;
 	private static NotificationPane notificationPane;
 	private static Scene scene;
@@ -93,11 +98,28 @@ public class App extends Application {
 
 	@Override
 	public void start(Stage stage) throws IOException, URISyntaxException {
-		Parent root = loadFXML("/homePage");
-		notificationPane = new NotificationPane(root);
+		VBox container = new VBox();
+		container.setFillWidth(true);
+
+		progressBar = new ProgressBar(0);
+		progressBar.setPrefWidth(Double.MAX_VALUE);
+		progressBar.setMaxWidth(Double.MAX_VALUE);
+		progressBar.setPrefHeight(10);
+		progressBar.setVisible(false);
+		container.getChildren().add(progressBar);
+
+		VBox page = (VBox) loadFXML("/homePage");
+		page.setFillWidth(true);
+		page.setAlignment(Pos.TOP_CENTER);
+		notificationPane = new NotificationPane(page);
+		notificationPane.setPrefWidth(Double.MAX_VALUE);
+		notificationPane.setMaxWidth(Double.MAX_VALUE);
+		VBox.setVgrow(notificationPane, Priority.ALWAYS);
 		notificationPane.setShowFromTop(false);
 		notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
-		scene = new Scene(notificationPane, 620, 700);
+		container.getChildren().add(notificationPane);
+
+		scene = new Scene(container, 500, 700);
 		URL resource = App.class.getResource("/styles.css");
 		scene.getStylesheets().add(resource.toExternalForm());
 		Image icon = new Image(getClass().getResourceAsStream("/journal-goldkey.png"));

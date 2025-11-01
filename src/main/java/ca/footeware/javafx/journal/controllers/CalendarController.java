@@ -16,7 +16,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -45,9 +44,6 @@ public class CalendarController extends VBox {
 
 	@FXML
 	private Label monthLabel;
-
-	@FXML
-	public ProgressBar progressBar;
 
 	@FXML
 	private Label yearLabel;
@@ -168,22 +164,26 @@ public class CalendarController extends VBox {
 
 	/**
 	 * Creates and fires a selection event.
-	 * 
+	 *
 	 * @param label {@link Label} the originating control
 	 */
 	private void fireSelectionEvent(Label label) {
 		// last event - may be used to save previous selection with text in textArea
 		LocalDate oldSelectedDate = null;
-		// currentSelection has the last selection which put the sought date in newDate
+		// currentSelection has the previous selection which put the sought date in
+		// newDate
 		if (currentSelection != null && currentSelection.newDate() != null) {
 			// what was new is now old
-			oldSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
-					currentSelection.newDate().getDayOfMonth());
+			oldSelectedDate = currentSelection.newDate();
 		}
 
-		// new event
-		LocalDate newSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
-				Integer.parseInt(label.getText()));
+		// new event, null indicates nothing was selected so textArea should clear
+		LocalDate newSelectedDate = null;
+		if (label != null) {
+			newSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
+					Integer.parseInt(label.getText()));
+			setBorder(label);
+		}
 
 		// selection object
 		currentSelection = new DateSelection(oldSelectedDate, newSelectedDate);
@@ -191,8 +191,8 @@ public class CalendarController extends VBox {
 		// fire event
 		SelectionEvent selectionEvent = new SelectionEvent(SelectionEvent.DATE_SELECTED, currentSelection);
 		System.err.println("\nCalendarController firing event, newDate=" + currentSelection.newDate());
-		label.fireEvent(selectionEvent);
-		setBorder(label);
+
+		dateGrid.fireEvent(selectionEvent);
 	}
 
 	/**
@@ -231,12 +231,14 @@ public class CalendarController extends VBox {
 				: Month.of(currentYearMonth.getMonthValue() + 1);
 		YearMonth nextMonth = YearMonth.of(currentYearMonth.getYear(), nextMonthEnum);
 		drawMonth(nextMonth);
+		fireSelectionEvent(null);
 	}
 
 	@FXML
 	private void onNextYearAction() {
 		YearMonth nextYear = YearMonth.of(currentYearMonth.getYear() + 1, currentYearMonth.getMonth());
 		drawMonth(nextYear);
+		fireSelectionEvent(null);
 	}
 
 	@FXML
@@ -246,12 +248,14 @@ public class CalendarController extends VBox {
 				: Month.of(currentYearMonth.getMonthValue() - 1);
 		YearMonth previousMonth = YearMonth.of(currentYearMonth.getYear(), previousMonthEnum);
 		drawMonth(previousMonth);
+		fireSelectionEvent(null);
 	}
 
 	@FXML
 	private void onPreviousYearAction() {
 		YearMonth yesterYear = YearMonth.of(currentYearMonth.getYear() - 1, currentYearMonth.getMonth());
 		drawMonth(yesterYear);
+		fireSelectionEvent(null);
 	}
 
 	/**

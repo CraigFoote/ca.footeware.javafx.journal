@@ -67,7 +67,7 @@ public class JournalManager {
 
 	/**
 	 * Gets the journal entry for provided date.
-	 * 
+	 *
 	 * @param date {@link LocalDate}
 	 * @return {@link String}
 	 * @throws JournalException

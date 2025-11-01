@@ -16,7 +16,7 @@ public class SelectionEvent extends Event {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param eventType    {@link EventType}
 	 * @param oldSelection {@link DateSelection}
 	 */
