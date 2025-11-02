@@ -154,6 +154,23 @@ public class CalendarController extends VBox {
 		colorizeEntryDays();
 	}
 
+	private Label findDateLabel(LocalDate date) {
+		for (Node node : dateGrid.getChildren()) {
+			// if it's this year and month
+			if (currentYearMonth.getYear() == date.getYear() && currentYearMonth.getMonth() == date.getMonth()
+					&& node instanceof Label label) {
+
+				LocalDate nodeDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
+						Integer.parseInt(label.getText()));
+
+				if (nodeDate.equals(date)) {
+					return label;
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Creates and fires a selection event.
 	 *
@@ -223,21 +240,12 @@ public class CalendarController extends VBox {
 		}
 	}
 
-	private Label findDateLabel(LocalDate date) {
-		for (Node node : dateGrid.getChildren()) {
-			// if it's this year and month
-			if (currentYearMonth.getYear() == date.getYear() && currentYearMonth.getMonth() == date.getMonth()
-					&& node instanceof Label label) {
-
-				LocalDate nodeDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
-						Integer.parseInt(label.getText()));
-
-				if (nodeDate.equals(date)) {
-					return label;
-				}
-			}
+	public boolean isSaved(LocalDate date, String text) throws JournalException {
+		String entry = null;
+		if (JournalManager.hasDate(date)) {
+			entry = JournalManager.getEntry(date);
 		}
-		return null;
+		return text != null && text.equals(entry);
 	}
 
 	@FXML
@@ -279,14 +287,6 @@ public class CalendarController extends VBox {
 		if (node instanceof Label label) {
 			fireSelectionEvent(label);
 		}
-	}
-
-	public boolean isSaved(LocalDate date, String text) throws JournalException {
-		String entry = null;
-		if (JournalManager.hasDate(date)) {
-			entry = JournalManager.getEntry(date);
-		}
-		return text != null && text.equals(entry);
 	}
 
 	/**

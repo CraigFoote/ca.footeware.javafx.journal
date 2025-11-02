@@ -215,6 +215,10 @@ public class JournalManager {
 		return selectedDate;
 	}
 
+	public static boolean hasDate(LocalDate date) {
+		return getEntryDates().contains(date);
+	}
+
 	/**
 	 * Opens an existing journal at the specified file path and using the provided
 	 * password.
@@ -255,9 +259,5 @@ public class JournalManager {
 	 * Constructor, hidden because all methods are static.
 	 */
 	private JournalManager() {
-	}
-
-	public static boolean hasDate(LocalDate date) {
-		return getEntryDates().contains(date);
 	}
 }

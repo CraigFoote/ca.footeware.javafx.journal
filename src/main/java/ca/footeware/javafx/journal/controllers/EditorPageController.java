@@ -34,7 +34,7 @@ public class EditorPageController {
 
 	/**
 	 * Called after injection of widgets.
-	 * 
+	 *
 	 * @throws JournalException
 	 */
 	@FXML
@@ -242,7 +242,7 @@ public class EditorPageController {
 
 	/**
 	 * Toggle the window title as dirty (unsaved changes).
-	 * 
+	 *
 	 * @param makeDirty boolean
 	 */
 	private void setDirtyTitle(boolean makeDirty) {
