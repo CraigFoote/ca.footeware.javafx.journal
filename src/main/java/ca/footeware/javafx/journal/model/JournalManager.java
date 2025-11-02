@@ -10,6 +10,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,26 +19,27 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
 
 /**
- * Provides a read/write interface to the {@link Journal}.
+ * Provides a read/write interface to the {@link Journal} using
+ * {@link LocalDate}s.
  */
 public class JournalManager {
 
+	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	private static Journal journal;
 
 	/**
 	 * Add an entry to the journal.
 	 *
-	 * @param key   {@link String} a date in the format YYYY-MM-DD.
+	 * @param key   {@link LocalDate}
 	 * @param value {@link String} the text of the entry, to be encrypted
 	 * @throws JournalException
 	 */
-	public static void addEntry(String key, String value) throws JournalException {
+	public static void addEntry(LocalDate key, String value) throws JournalException {
 		try {
-			journal.addEntry(key, value);
+			journal.addEntry(key.format(dateFormatter), value);
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
 				| BadPaddingException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
 			throw new JournalException("Error adding entry to journal.", e);
@@ -73,7 +75,7 @@ public class JournalManager {
 	 * @throws JournalException
 	 */
 	public static String getEntry(LocalDate date) throws JournalException {
-		String formatted = date.format(App.dateFormatter);
+		String formatted = date.format(dateFormatter);
 		try {
 			return journal.getEntry(formatted);
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
@@ -98,16 +100,11 @@ public class JournalManager {
 		}
 	}
 
-	/**
-	 * Get the dates/keys from the journal.
-	 *
-	 * @return {@link List} of {@link String}
-	 */
-	public static List<String> getEntryDates() {
-		List<String> keys = new ArrayList<>();
+	public static List<LocalDate> getEntryDates() {
+		List<LocalDate> keys = new ArrayList<>();
 		Map<String, String> entries = journal.getEntries();
 		for (String key : entries.keySet()) {
-			keys.add(key);
+			keys.add(LocalDate.parse(key, dateFormatter));
 		}
 		return keys;
 	}
@@ -118,9 +115,9 @@ public class JournalManager {
 	 * @return {@link LocalDate}
 	 */
 	public static LocalDate getFirstEntryDate() {
-		List<String> entryDates = getEntryDates();
+		List<LocalDate> entryDates = getEntryDates();
 		if (!entryDates.isEmpty()) {
-			return LocalDate.parse(entryDates.get(0), App.dateFormatter);
+			return entryDates.get(0);
 		}
 		return null;
 	}
@@ -131,10 +128,9 @@ public class JournalManager {
 	 * @return {@link LocalDate}
 	 */
 	public static LocalDate getLastEntryDate() {
-		List<String> entryDates = getEntryDates();
+		List<LocalDate> entryDates = getEntryDates();
 		if (!entryDates.isEmpty()) {
-			String formattedDate = entryDates.get(entryDates.size() - 1);
-			return LocalDate.parse(formattedDate, App.dateFormatter);
+			return entryDates.get(entryDates.size() - 1);
 		}
 		return null;
 	}
@@ -146,14 +142,13 @@ public class JournalManager {
 	 * @return {@link LocalDate} may be the same as the provided date
 	 */
 	public static LocalDate getNextEntryDate(LocalDate selectedDate) {
-		List<String> entryDates = getEntryDates();
+		List<LocalDate> entryDates = getEntryDates();
 		switch (entryDates.size()) {
 		case 0 -> {
 			return selectedDate;
 		}
 		case 1 -> {
-			LocalDate entryDate = LocalDate.parse(entryDates.get(0), App.dateFormatter);
-			return entryDate.isAfter(selectedDate) ? entryDate : selectedDate;
+			return entryDates.get(0).isAfter(selectedDate) ? entryDates.get(0) : selectedDate;
 		}
 		default -> {
 			/*
@@ -163,15 +158,13 @@ public class JournalManager {
 			 * the second entryDate.
 			 */
 			for (int i = 0; i < entryDates.size(); i++) {
-				String entryDate1 = entryDates.get(i);
-				LocalDate date1 = LocalDate.parse(entryDate1, App.dateFormatter);
-				if (selectedDate.isBefore(date1)) {
-					return date1;
+				LocalDate entryDate1 = entryDates.get(i);
+				if (selectedDate.isBefore(entryDate1)) {
+					return entryDate1;
 				} else if ((i + 1) < entryDates.size()) {
-					String entryDate2 = entryDates.get(i + 1);
-					LocalDate date2 = LocalDate.parse(entryDate2, App.dateFormatter);
-					if (date1.isEqual(selectedDate) || (date1.isBefore(selectedDate) && date2.isAfter(selectedDate))) {
-						return date2; // next entry
+					LocalDate entryDate2 = entryDates.get(i + 1);
+					if (entryDate1.isBefore(selectedDate) && entryDate2.isAfter(selectedDate)) {
+						return entryDate2; // next entry
 					}
 				}
 			}
@@ -189,14 +182,13 @@ public class JournalManager {
 	 *         previous entry
 	 */
 	public static LocalDate getPreviousEntryDate(LocalDate selectedDate) {
-		List<String> entryDates = getEntryDates();
+		List<LocalDate> entryDates = getEntryDates();
 		switch (entryDates.size()) {
 		case 0 -> {
 			return selectedDate;
 		}
 		case 1 -> {
-			LocalDate entryDate = LocalDate.parse(entryDates.get(0), App.dateFormatter);
-			return entryDate.isBefore(selectedDate) ? entryDate : selectedDate;
+			return entryDates.get(0).isBefore(selectedDate) ? entryDates.get(0) : selectedDate;
 		}
 		default -> {
 			/*
@@ -206,15 +198,14 @@ public class JournalManager {
 			 * return the first entryDate.
 			 */
 			for (int i = entryDates.size() - 1; i >= 0; i--) {
-				String entryDate1 = entryDates.get(i);
-				LocalDate date1 = LocalDate.parse(entryDate1, App.dateFormatter);
-				if (selectedDate.isAfter(date1)) {
-					return date1;
+				LocalDate entryDate1 = entryDates.get(i);
+				if (selectedDate.isAfter(entryDate1)) {
+					return entryDate1;
 				} else if ((i - 1) >= 0) {
-					String entryDate2 = entryDates.get(i - 1);
-					LocalDate date2 = LocalDate.parse(entryDate2, App.dateFormatter);
-					if (selectedDate.isAfter(date2) || (date2.isBefore(selectedDate) && date1.isAfter(selectedDate))) {
-						return date2; // previous entry
+					LocalDate entryDate2 = entryDates.get(i - 1);
+					if (selectedDate.isAfter(entryDate2)
+							|| (entryDate2.isBefore(selectedDate) && entryDate1.isAfter(selectedDate))) {
+						return entryDate2; // previous entry
 					}
 				}
 			}
@@ -264,5 +255,9 @@ public class JournalManager {
 	 * Constructor, hidden because all methods are static.
 	 */
 	private JournalManager() {
+	}
+
+	public static boolean hasDate(LocalDate date) {
+		return getEntryDates().contains(date);
 	}
 }

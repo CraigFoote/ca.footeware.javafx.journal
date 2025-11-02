@@ -1,12 +1,11 @@
 package ca.footeware.javafx.journal.controllers;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.List;
 
-import ca.footeware.javafx.journal.App;
+import ca.footeware.javafx.journal.exceptions.JournalException;
 import ca.footeware.javafx.journal.model.DateSelection;
 import ca.footeware.javafx.journal.model.JournalManager;
 import ca.footeware.javafx.journal.model.SelectionEvent;
@@ -36,7 +35,6 @@ import javafx.scene.text.FontWeight;
 public class CalendarController extends VBox {
 
 	private DateSelection currentSelection;
-
 	private YearMonth currentYearMonth;
 
 	@FXML
@@ -84,15 +82,13 @@ public class CalendarController extends VBox {
 	 */
 	public void colorizeEntryDays() {
 		clearBackgrounds();
-		List<String> entryDates = JournalManager.getEntryDates();
-		for (String entryDateStr : entryDates) {
-			LocalDate entryDate = LocalDate.parse(entryDateStr, App.dateFormatter);
+		List<LocalDate> entryDates = JournalManager.getEntryDates();
+		for (LocalDate entryDate : entryDates) {
 			// filter to retain only those days in the currently selected YearMonth
 			if (entryDate.getYear() == currentYearMonth.getYear()
 					&& entryDate.getMonth() == currentYearMonth.getMonth()) {
-				String dayNumStr = entryDateStr.substring(entryDateStr.lastIndexOf("-") + 1); // yyyy-MM-dd
-				int dayNum = Integer.parseInt(dayNumStr) - 1; // days are 1-based
-				Node node = dateGrid.getChildren().get(dayNum); // get(idx) is 0-based
+				int dayNum = entryDate.getDayOfMonth();
+				Node node = dateGrid.getChildren().get(dayNum - 1);
 				if (node instanceof Label label) {
 					label.setBackground(new Background(
 							new BackgroundFill(Color.color(0.275, 0.51, 0.706), new CornerRadii(5), null))); // blue
@@ -105,15 +101,11 @@ public class CalendarController extends VBox {
 	 * Colorize today's date in the calendar.
 	 */
 	private void colorizeToday() {
-		LocalDateTime now = LocalDateTime.now();
-		for (Node node : dateGrid.getChildren()) {
-			// if it's this year and month and label matches today's date
-			if (currentYearMonth.getYear() == now.getYear() && currentYearMonth.getMonth() == now.getMonth()
-					&& node instanceof Label label && label.getText().equals(String.valueOf(now.getDayOfMonth()))) {
-				label.setFont(Font.font(label.getFont().getFamily(), FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 14.0));
-				label.getStyleClass().add("today");
-				return;
-			}
+		LocalDate now = LocalDate.now();
+		Label label = findDateLabel(now);
+		if (label != null) {
+			label.setFont(Font.font(label.getFont().getFamily(), FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 14.0));
+			label.getStyleClass().add("today");
 		}
 	}
 
@@ -190,7 +182,6 @@ public class CalendarController extends VBox {
 
 		// fire event
 		SelectionEvent selectionEvent = new SelectionEvent(SelectionEvent.DATE_SELECTED, currentSelection);
-		System.err.println("\nCalendarController firing event, newDate=" + currentSelection.newDate());
 
 		dateGrid.fireEvent(selectionEvent);
 	}
@@ -222,6 +213,31 @@ public class CalendarController extends VBox {
 
 		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
 		monthLabel.setText(currentYearMonth.getMonth().toString());
+
+		LocalDate now = LocalDate.now();
+		Label label = findDateLabel(now);
+		if (label != null) {
+			label.setFont(Font.font(label.getFont().getFamily(), FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 14.0));
+			label.getStyleClass().add("today");
+			fireSelectionEvent(label);
+		}
+	}
+
+	private Label findDateLabel(LocalDate date) {
+		for (Node node : dateGrid.getChildren()) {
+			// if it's this year and month
+			if (currentYearMonth.getYear() == date.getYear() && currentYearMonth.getMonth() == date.getMonth()
+					&& node instanceof Label label) {
+
+				LocalDate nodeDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
+						Integer.parseInt(label.getText()));
+
+				if (nodeDate.equals(date)) {
+					return label;
+				}
+			}
+		}
+		return null;
 	}
 
 	@FXML
@@ -258,16 +274,19 @@ public class CalendarController extends VBox {
 		fireSelectionEvent(null);
 	}
 
-	/**
-	 * Select a day of the month programmatically.
-	 *
-	 * @param today int the day of the month to select
-	 */
-	public void selectDayOfMonth(int day) {
+	public void selectDayOfMonth(int day) throws JournalException {
 		Node node = dateGrid.getChildrenUnmodifiable().get(day - 1);
 		if (node instanceof Label label) {
 			fireSelectionEvent(label);
 		}
+	}
+
+	public boolean isSaved(LocalDate date, String text) throws JournalException {
+		String entry = null;
+		if (JournalManager.hasDate(date)) {
+			entry = JournalManager.getEntry(date);
+		}
+		return text != null && text.equals(entry);
 	}
 
 	/**

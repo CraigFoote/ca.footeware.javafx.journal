@@ -3,7 +3,6 @@ package ca.footeware.javafx.journal;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,10 +27,6 @@ import javafx.stage.Window;
  */
 public class App extends Application {
 
-	/**
-	 * Formatter for dates to provide a {@link String} in format yyyy-MM-dd.
-	 */
-	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	public static ProgressBar progressBar;
 	private static FXMLLoader loader;
 	private static NotificationPane notificationPane;
@@ -98,6 +93,7 @@ public class App extends Application {
 
 	@Override
 	public void start(Stage stage) throws IOException, URISyntaxException {
+		// scene > container with [progressBar, notificationPane > page]
 		VBox container = new VBox();
 		container.setFillWidth(true);
 

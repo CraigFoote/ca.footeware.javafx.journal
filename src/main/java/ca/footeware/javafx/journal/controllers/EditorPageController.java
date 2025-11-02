@@ -7,6 +7,7 @@ import java.time.YearMonth;
 
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
+import ca.footeware.javafx.journal.model.DateSelection;
 import ca.footeware.javafx.journal.model.JournalManager;
 import ca.footeware.javafx.journal.model.SelectionEvent;
 import javafx.concurrent.Task;
@@ -14,8 +15,6 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -33,46 +32,13 @@ public class EditorPageController {
 	@FXML
 	private TextArea textArea;
 
-	private String displayedText;
-
-	/**
-	 * Check if there are unsaved changes in the editor and prompt the user to save.
-	 */
-	private void checkEditorState() {
-		System.err.println("\ncheckEditorState");
-		if (isDirty()) {
-			System.err.println("\tisDirty=" + isDirty());
-			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-			alert.setTitle("Unsaved Changes");
-			alert.setHeaderText("You have unsaved changes.");
-			alert.setContentText("Would you like to save them?");
-			ButtonType yesButton = new ButtonType("Yes", ButtonType.YES.getButtonData());
-			ButtonType noButton = new ButtonType("No", ButtonType.NO.getButtonData());
-			alert.getButtonTypes().setAll(yesButton, noButton);
-			alert.showAndWait().ifPresent(response -> {
-				if (response == yesButton) {
-					System.err.println("\tcalling onSaveAction");
-					onSaveAction();
-				}
-			});
-		}
-	}
-
-	/**
-	 * Remove the "• " prefix from the title if exists.
-	 */
-	private void clearDirtyTitle() {
-		String title = ((Stage) App.getPrimaryStage()).getTitle();
-		if (title.startsWith("• ")) {
-			((Stage) App.getPrimaryStage()).setTitle(title.substring(2));
-		}
-	}
-
 	/**
 	 * Called after injection of widgets.
+	 * 
+	 * @throws JournalException
 	 */
 	@FXML
-	private void initialize() {
+	private void initialize() throws JournalException {
 		URL resource = getClass().getResource("/calendar.fxml");
 		Node calendar;
 		try {
@@ -91,71 +57,68 @@ public class EditorPageController {
 			}
 
 			// mark title dirty on text change
-			textArea.textProperty().addListener((_, oldValue, newValue) -> onTextChanged(oldValue, newValue));
+			textArea.textProperty().addListener((_, oldValue, newValue) -> {
+				System.err.println("text listener, oldValue=" + oldValue + ", newValue=" + newValue);
+				onTextChanged(oldValue, newValue);
+			});
 		} catch (IOException e) {
 			App.notify(e.getMessage());
 		}
 	}
 
-	private boolean isDirty() {
-		String title = ((Stage) App.getPrimaryStage()).getTitle();
-		return title.startsWith("• ");
-	}
-
 	@FXML
-	private void onFirstEntryAction() {
-		checkEditorState();
+	private void onFirstEntryAction() throws JournalException {
 		LocalDate firstEntryDate = JournalManager.getFirstEntryDate();
 		if (firstEntryDate != null) {
 			YearMonth yearMonth = YearMonth.of(firstEntryDate.getYear(), firstEntryDate.getMonth());
 			calendarController.drawMonth(yearMonth);
 			calendarController.selectDayOfMonth(firstEntryDate.getDayOfMonth());
 		}
-		clearDirtyTitle();
+		setDirtyTitle(false);
 		textArea.requestFocus();
 	}
 
 	@FXML
-	private void onLastEntryAction() {
-		checkEditorState();
+	private void onLastEntryAction() throws JournalException {
 		LocalDate lastEntryDate = JournalManager.getLastEntryDate();
 		if (lastEntryDate != null) {
 			YearMonth yearMonth = YearMonth.of(lastEntryDate.getYear(), lastEntryDate.getMonth());
 			calendarController.drawMonth(yearMonth);
 			calendarController.selectDayOfMonth(lastEntryDate.getDayOfMonth());
 		}
-		clearDirtyTitle();
+		setDirtyTitle(false);
 		textArea.requestFocus();
 	}
 
 	@FXML
-	private void onNextEntryAction() {
-		checkEditorState();
+	private void onNextEntryAction() throws JournalException {
 		LocalDate selectedDate = calendarController.getSelectedDate();
 		LocalDate nextEntryDate = JournalManager.getNextEntryDate(selectedDate);
 		if (!selectedDate.equals(nextEntryDate)) {
 			YearMonth newYearMonth = YearMonth.of(nextEntryDate.getYear(), nextEntryDate.getMonth());
 			calendarController.drawMonth(newYearMonth);
 			calendarController.selectDayOfMonth(nextEntryDate.getDayOfMonth());
-			clearDirtyTitle();
+			setDirtyTitle(false);
 			textArea.requestFocus();
 		}
 	}
 
 	@FXML
-	private void onPreviousEntryAction() {
-		checkEditorState();
+	private void onPreviousEntryAction() throws JournalException {
 		LocalDate selectedDate = calendarController.getSelectedDate();
 		LocalDate previousEntryDate = JournalManager.getPreviousEntryDate(selectedDate);
-		YearMonth newYearMonth = YearMonth.of(previousEntryDate.getYear(), previousEntryDate.getMonth());
-		calendarController.drawMonth(newYearMonth);
-		calendarController.selectDayOfMonth(previousEntryDate.getDayOfMonth());
-		clearDirtyTitle();
-		textArea.requestFocus();
+		if (!selectedDate.equals(previousEntryDate)) {
+			YearMonth newYearMonth = YearMonth.of(previousEntryDate.getYear(), previousEntryDate.getMonth());
+			calendarController.drawMonth(newYearMonth);
+			calendarController.selectDayOfMonth(previousEntryDate.getDayOfMonth());
+			setDirtyTitle(false);
+			textArea.requestFocus();
+		}
 	}
 
 	@FXML
 	private void onSaveAction() {
+		System.err.println("onSaveAction");
 		Task<Void> saveTask = new Task<>() {
 			@Override
 			protected Void call() throws Exception {
@@ -163,11 +126,7 @@ public class EditorPageController {
 				App.progressBar.setVisible(true);
 				LocalDate selectedDate = calendarController.getSelectedDate();
 				updateProgress(4, 10);
-				String formattedDate = selectedDate.format(App.dateFormatter);
-				System.err.println("\nonSaveAction saveTask, adding entry for " + formattedDate + ": " + displayedText);
-				updateProgress(6, 10);
-				// displayedText should have been set by now
-				JournalManager.addEntry(formattedDate, displayedText);
+				JournalManager.addEntry(selectedDate, textArea.getText());
 				updateProgress(8, 10);
 				JournalManager.saveJournal();
 				updateProgress(10, 10);
@@ -176,8 +135,8 @@ public class EditorPageController {
 
 			@Override
 			protected void succeeded() {
+				setDirtyTitle(false);
 				calendarController.colorizeEntryDays();
-				clearDirtyTitle();
 				textArea.requestFocus();
 				App.notify("Journal was saved.");
 				App.progressBar.progressProperty().unbind();
@@ -196,114 +155,106 @@ public class EditorPageController {
 	 * @param Event {@link Event}
 	 */
 	private void onSelectionEvent(Event event) {
-		System.err.println("\nonSelectionEvent");
 		if (event instanceof SelectionEvent selectionEvent) {
 			LocalDate newDate = selectionEvent.getSelection().newDate();
-			displayedText = textArea.getText();
-			checkEditorState();
+			String oldEntry = textArea.getText();
 
 			// old date entry saved, display new entry
-			String newEntry = null;
 			try {
 				if (newDate != null) {
-					newEntry = JournalManager.getEntry(newDate);
+					String newEntry = JournalManager.getEntry(newDate);
+					textArea.setText(newEntry);
+					textArea.requestFocus();
 				}
-				System.err.println("\tsetting textArea to newEntry: " + newEntry);
-				textArea.setText(newEntry);
-				textArea.requestFocus();
 
 				calendarController.colorizeEntryDays();
-				clearDirtyTitle();
+				setDirtyTitle(false);
 			} catch (JournalException e) {
 				App.notify(e.getMessage());
 			}
-
-//			if (isDirty()) {
-//				Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//				alert.setTitle("Unsaved Changes");
-//				alert.setHeaderText("You have unsaved changes.");
-//				alert.setContentText("Would you like to save them?");
-//				ButtonType yesButton = new ButtonType("Yes", ButtonType.YES.getButtonData());
-//				ButtonType noButton = new ButtonType("No", ButtonType.NO.getButtonData());
-//				alert.getButtonTypes().setAll(yesButton, noButton);
-//				alert.showAndWait().ifPresent(response -> {
-//					if (response == yesButton) {
-//						DateSelection selection = selectionEvent.getSelection();
-//						LocalDate oldSelectedDate = selection.oldDate();
-//						String oldEntry = textArea.getText();
-//						try {
-//							JournalManager.addEntry(oldSelectedDate.format(App.dateFormatter), oldEntry);
-//							JournalManager.saveJournal();
-//							calendarController.colorizeEntryDays();
-//							clearDirtyTitle();
-//							// old date entry saved, display new entry
-//							String newEntry = JournalManager.getEntry(selection.newDate());
-//							textArea.setText(newEntry);
-//							textArea.requestFocus();
-//						} catch (JournalException e) {
-//							App.notify(e.getMessage());
-//						}
-//					} else {
-//						// user pressed no - clear the dirty indicator
-//						clearDirtyTitle();
-//						textArea.requestFocus();
-//					}
-//				});
-//			} else {
-//				LocalDate newDate = selectionEvent.getSelection().newDate();
-//				try {
-//					calendarController.colorizeEntryDays();
-//					clearDirtyTitle();
-//					String entry = null;
-//					if (newDate != null) {
-//						entry = JournalManager.getEntry(newDate);
-//					}
-//					textArea.setText(entry);
-//				} catch (JournalException e) {
-//					App.notify(e.getMessage());
-//				}
-//			}
 		}
 	}
 
 	private void onTextChanged(String oldValue, String newValue) {
-		System.err.println("\neditorPage onTextChanged");
-		System.err.println("\toldValue: " + oldValue);
-		System.err.println("\tnewValue: " + newValue);
-		LocalDate currentDate = calendarController.getCurrentSelection().newDate();
-		if (currentDate != null) {
-			try {
-				displayedText = textArea.getText(); // used in #onSaveAction TODO streamline
-				System.err.println("\tdisplayedText=" + displayedText);
-				String entry = JournalManager.getEntry(currentDate);
-				System.err.println("\tentry: " + entry);
-				if ((newValue != null && !newValue.equals(entry)) || (entry != null && newValue == null)) {
-					System.err.println("\tdirty");
-					setDirtyTitle();
+		DateSelection currentSelection = calendarController.getCurrentSelection();
+		if (currentSelection != null) {
+			LocalDate currentDate = currentSelection.newDate();
+			if (currentDate != null) {
+				try {
+					String entry = JournalManager.getEntry(currentDate);
+					if ((newValue != null && newValue.equals(entry)) || (entry != null && newValue == null)) {
+						setDirtyTitle(true);
+					}
+				} catch (JournalException e) {
+					App.notify(e.getMessage());
 				}
-			} catch (JournalException e) {
-				App.notify(e.getMessage());
 			}
+		} else if (currentSelection == null && newValue != null) {
+			setDirtyTitle(true);
 		}
 	}
 
 	@FXML
 	private void onTodayAction() {
-		checkEditorState();
-		calendarController.drawMonth(YearMonth.now());
-		int today = LocalDate.now().getDayOfMonth();
-		calendarController.selectDayOfMonth(today);
-		clearDirtyTitle();
-		textArea.requestFocus();
+		String text = textArea.getText();
+		LocalDate now = LocalDate.now();
+		try {
+			if (!calendarController.isSaved(now, text)) {
+				save(now, text);
+			}
+			calendarController.drawMonth(YearMonth.now());
+			calendarController.selectDayOfMonth(LocalDate.now().getDayOfMonth());
+			textArea.requestFocus();
+			setDirtyTitle(false);
+		} catch (JournalException e) {
+			App.notify(e.getMessage());
+		}
+	}
+
+	private void save(LocalDate date, String text) {
+		Task<Void> saveTask = new Task<>() {
+			@Override
+			protected Void call() throws Exception {
+				App.progressBar.setVisible(true);
+				updateProgress(2, 10);
+				JournalManager.addEntry(date, text);
+				updateProgress(6, 10);
+				JournalManager.saveJournal();
+				updateProgress(10, 10);
+				return null;
+			}
+
+			@Override
+			protected void succeeded() {
+				setDirtyTitle(false);
+				calendarController.colorizeEntryDays();
+				textArea.requestFocus();
+				App.notify("Journal was saved.");
+				App.progressBar.progressProperty().unbind();
+				App.progressBar.setVisible(false);
+			}
+		};
+		App.progressBar.progressProperty().bind(saveTask.progressProperty());
+		var t = new Thread(saveTask);
+		t.setDaemon(true);
+		t.start();
 	}
 
 	/**
-	 * Mark the window title as dirty (unsaved changes).
+	 * Toggle the window title as dirty (unsaved changes).
+	 * 
+	 * @param makeDirty boolean
 	 */
-	private void setDirtyTitle() {
+	private void setDirtyTitle(boolean makeDirty) {
 		String title = ((Stage) App.getPrimaryStage()).getTitle();
-		if (!title.startsWith("• ")) {
-			((Stage) App.getPrimaryStage()).setTitle("• " + title);
+		if (makeDirty) {
+			if (!title.startsWith("• ")) {
+				((Stage) App.getPrimaryStage()).setTitle("• " + title);
+			}
+		} else {
+			if (title.startsWith("• ")) {
+				((Stage) App.getPrimaryStage()).setTitle(title.substring(2));
+			}
 		}
 	}
 }
