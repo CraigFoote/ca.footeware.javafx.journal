@@ -23,7 +23,7 @@ import ca.footeware.javafx.journal.exceptions.JournalException;
 
 /**
  * Provides a read/write interface to the {@link Journal} using
- * {@link LocalDate}s.
+ * {@link LocalDate} keys and {@link String} values.
  */
 public class JournalManager {
 
@@ -85,21 +85,10 @@ public class JournalManager {
 	}
 
 	/**
-	 * Get a day's journal entry.
+	 * Gets the list of entry date values; the set of keys.
 	 *
-	 * @param formattedDate {@link String} in format yyyy-MM-dd.
-	 * @return {@link String} may be null
-	 * @throws JournalException
+	 * @return {@link List} of {@link LocalDate}
 	 */
-	public static String getEntry(String formattedDate) throws JournalException {
-		try {
-			return journal.getEntry(String.valueOf(formattedDate));
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
-				| BadPaddingException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
-			throw new JournalException("Error: " + e.getMessage() + ". Was the password correct?", e);
-		}
-	}
-
 	public static List<LocalDate> getEntryDates() {
 		List<LocalDate> keys = new ArrayList<>();
 		Map<String, String> entries = journal.getEntries();
@@ -139,7 +128,8 @@ public class JournalManager {
 	 * Get the next journal entry after the provided date.
 	 *
 	 * @param selectedDate {@link LocalDate}
-	 * @return {@link LocalDate} may be the same as the provided date
+	 * @return {@link LocalDate} may be the same as the provided date if there is no
+	 *         subsequent entry.
 	 */
 	public static LocalDate getNextEntryDate(LocalDate selectedDate) {
 		List<LocalDate> entryDates = getEntryDates();
@@ -215,6 +205,12 @@ public class JournalManager {
 		return selectedDate;
 	}
 
+	/**
+	 * Determines if the provided date is a key in the journal.
+	 *
+	 * @param date {@link LocalDate}
+	 * @return boolean true if the date is found
+	 */
 	public static boolean hasDate(LocalDate date) {
 		return getEntryDates().contains(date);
 	}

@@ -98,7 +98,7 @@ public class CalendarController extends VBox {
 	}
 
 	/**
-	 * Colorize today's date in the calendar.
+	 * Stylize today's date in the calendar.
 	 */
 	private void colorizeToday() {
 		LocalDate now = LocalDate.now();
@@ -150,10 +150,17 @@ public class CalendarController extends VBox {
 		monthLabel.setText(currentYearMonth.getMonth().toString());
 
 		createDateGrid();
-		colorizeToday();
 		colorizeEntryDays();
+		colorizeToday();
 	}
 
+	/**
+	 * Find and return the date label that matches the provided date. Will be null
+	 * in cases where the date is not within the displayed {@link YearMonth}.
+	 *
+	 * @param date {@link LocalDate}
+	 * @return {@link Label} may be null
+	 */
 	private Label findDateLabel(LocalDate date) {
 		for (Node node : dateGrid.getChildren()) {
 			// if it's this year and month
@@ -240,6 +247,15 @@ public class CalendarController extends VBox {
 		}
 	}
 
+	/**
+	 * Determines if the provided date has an entry and if that entry has the
+	 * provided text, assuming it has been saved already.
+	 *
+	 * @param date {@link LocalDate}
+	 * @param text {@link String}
+	 * @return boolean true if the entry has been saved already
+	 * @throws JournalException when no entry can be found for provided date
+	 */
 	public boolean isSaved(LocalDate date, String text) throws JournalException {
 		String entry = null;
 		if (JournalManager.hasDate(date)) {
@@ -282,7 +298,14 @@ public class CalendarController extends VBox {
 		fireSelectionEvent(null);
 	}
 
-	public void selectDayOfMonth(int day) throws JournalException {
+	/**
+	 * Find the displayed label for the provided day number and select it, firing a
+	 * selection event.
+	 *
+	 * @param day int
+	 * @throws JournalException when ice-cream has bones in it
+	 */
+	public void selectDayOfMonth(int day) {
 		Node node = dateGrid.getChildrenUnmodifiable().get(day - 1);
 		if (node instanceof Label label) {
 			fireSelectionEvent(label);

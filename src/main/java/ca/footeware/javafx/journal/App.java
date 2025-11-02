@@ -29,7 +29,7 @@ public class App extends Application {
 
 	private static FXMLLoader loader;
 	private static NotificationPane notificationPane;
-	public static ProgressBar progressBar;
+	private static ProgressBar progressBar;
 	private static Scene scene;
 	private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -40,6 +40,15 @@ public class App extends Application {
 	 */
 	public static Window getPrimaryStage() {
 		return scene.getWindow();
+	}
+
+	/**
+	 * Gets the progressBar.
+	 *
+	 * @return {@link ProgressBar}
+	 */
+	public static ProgressBar getProgressBar() {
+		return progressBar;
 	}
 
 	/**
