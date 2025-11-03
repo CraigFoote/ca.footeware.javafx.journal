@@ -158,7 +158,13 @@ public class EditorPageController {
 
 			try {
 				String oldEntry = JournalManager.getEntry(oldDate);
-				if (!oldDate.equals(newDate) && !displayedText.equals(oldEntry)) {
+
+				boolean datesEqual = oldDate.equals(newDate); // selected same day
+				boolean textsNull = displayedText == null && oldEntry == null;
+				boolean textsMatch = oldEntry != null && oldEntry.equals(displayedText);
+				boolean isDirty = !datesEqual && !textsNull && !textsMatch;
+
+				if (isDirty) {
 					// edits made, prompt to save then show newly selected entry
 					promptToSave(oldDate, displayedText);
 				}
@@ -166,7 +172,7 @@ public class EditorPageController {
 				App.notify(e.getMessage());
 			}
 
-			// old date entry saved, display new entry
+			// old date edits saved or abandoned, display new entry
 			try {
 				if (newDate != null) {
 					String newEntry = JournalManager.getEntry(newDate);
@@ -193,7 +199,8 @@ public class EditorPageController {
 		if (currentSelection != null && currentSelection.newDate() != null) {
 			try {
 				String entry = JournalManager.getEntry(currentSelection.newDate());
-				if ((newValue != null && newValue.equals(entry)) || (entry != null && newValue == null)) {
+				if ((newValue != null && newValue.equals(entry)) || (entry != null && newValue == null)
+						|| (newValue != null && entry != null && !entry.equals(newValue))) {
 					setDirty(true);
 				}
 			} catch (JournalException e) {
@@ -231,7 +238,7 @@ public class EditorPageController {
 	private void promptToSave(LocalDate date, String text) {
 		Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 		alert.setTitle("Unsaved Changes");
-		alert.setHeaderText("You have unsaved changes.");
+		alert.setHeaderText("You have unsaved changes on " + date + ".");
 		alert.setContentText("Would you like to save them?");
 		ButtonType yesButton = new ButtonType("Yes", ButtonType.YES.getButtonData());
 		ButtonType noButton = new ButtonType("No", ButtonType.NO.getButtonData());
