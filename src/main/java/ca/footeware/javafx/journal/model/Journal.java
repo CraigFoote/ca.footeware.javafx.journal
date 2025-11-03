@@ -48,9 +48,9 @@ public class Journal {
 			this.properties.load(in);
 		}
 		/*
-		 * The TreeMap, this.map,is natively sorted by key (so date), is the data model
-		 * object. The Properties file, this.properties, is the persistence vector. Copy
-		 * its entries to the map.
+		 * The TreeMap, this.map, is natively sorted by key (so date strings are
+		 * ascending), is the data model object. The Properties file, this.properties,
+		 * is the persistence vector. Copy its entries to the map.
 		 */
 		this.properties.entrySet().forEach(entry -> map.put((String) entry.getKey(), (String) entry.getValue()));
 	}

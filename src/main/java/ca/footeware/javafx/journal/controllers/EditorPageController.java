@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
@@ -26,6 +27,7 @@ import javafx.stage.Stage;
  */
 public class EditorPageController {
 
+	private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM d, yyyy");
 	private CalendarController calendarController;
 
 	@FXML
@@ -115,34 +117,9 @@ public class EditorPageController {
 
 	@FXML
 	private void onSaveAction() {
-		Task<Void> saveTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				updateProgress(2, 10);
-				App.getProgressBar().setVisible(true);
-				LocalDate selectedDate = calendarController.getSelectedDate();
-				updateProgress(4, 10);
-				JournalManager.addEntry(selectedDate, textArea.getText());
-				updateProgress(8, 10);
-				JournalManager.saveJournal();
-				updateProgress(10, 10);
-				return null;
-			}
-
-			@Override
-			protected void succeeded() {
-				setDirty(false);
-				calendarController.colorizeEntryDays();
-				textArea.requestFocus();
-				App.notify("Journal was saved.");
-				App.getProgressBar().progressProperty().unbind();
-				App.getProgressBar().setVisible(false);
-			}
-		};
-		App.getProgressBar().progressProperty().bind(saveTask.progressProperty());
-		var thread = new Thread(saveTask);
-		thread.setDaemon(true);
-		thread.start();
+		LocalDate selectedDate = calendarController.getSelectedDate();
+		String text = textArea.getText();
+		save(selectedDate, text);
 	}
 
 	/**
@@ -238,7 +215,8 @@ public class EditorPageController {
 	private void promptToSave(LocalDate date, String text) {
 		Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 		alert.setTitle("Unsaved Changes");
-		alert.setHeaderText("You have unsaved changes on " + date + ".");
+		String formatted = date.format(dateFormatter);
+		alert.setHeaderText("You have unsaved changes on " + formatted + ".");
 		alert.setContentText("Would you like to save them?");
 		ButtonType yesButton = new ButtonType("Yes", ButtonType.YES.getButtonData());
 		ButtonType noButton = new ButtonType("No", ButtonType.NO.getButtonData());
@@ -261,8 +239,9 @@ public class EditorPageController {
 		Task<Void> saveTask = new Task<>() {
 			@Override
 			protected Void call() throws Exception {
-				App.getProgressBar().setVisible(true);
 				updateProgress(2, 10);
+				App.getProgressBar().setVisible(true);
+				updateProgress(4, 10);
 				JournalManager.addEntry(date, text);
 				updateProgress(6, 10);
 				JournalManager.saveJournal();
@@ -281,9 +260,9 @@ public class EditorPageController {
 			}
 		};
 		App.getProgressBar().progressProperty().bind(saveTask.progressProperty());
-		var t = new Thread(saveTask);
-		t.setDaemon(true);
-		t.start();
+		var thread = new Thread(saveTask);
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 	/**
