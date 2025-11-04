@@ -34,14 +34,14 @@ import javafx.scene.text.FontWeight;
  */
 public class CalendarController extends VBox {
 
-	private DateSelection currentSelection;
 	private YearMonth currentYearMonth;
-
 	@FXML
 	private GridPane dateGrid;
 
 	@FXML
 	private Label monthLabel;
+
+	private DateSelection previousSelection;
 
 	@FXML
 	private Label yearLabel;
@@ -129,7 +129,7 @@ public class CalendarController extends VBox {
 			final Label dayLabel = new Label(Integer.toString(day));
 			GridPane.setHalignment(dayLabel, HPos.CENTER);
 
-			dayLabel.setOnMouseClicked(_ -> fireSelectionEvent(dayLabel));
+			dayLabel.setOnMouseClicked(_ -> fireSelectionEvent(getDate(dayLabel)));
 			dayLabel.setCursor(Cursor.HAND);
 			dayLabel.setTextFill(Color.WHITE);
 			dayLabel.setFont(Font.font(dayLabel.getFont().getFamily(), FontWeight.NORMAL, FontPosture.REGULAR, 14.0));
@@ -183,30 +183,24 @@ public class CalendarController extends VBox {
 	 *
 	 * @param label {@link Label} the originating control
 	 */
-	private void fireSelectionEvent(Label label) {
-		// last event - may be used to save previous selection with text in textArea
-		LocalDate oldSelectedDate = null;
-		// currentSelection has the previous selection which put the sought date in
-		// newDate
-		if (currentSelection != null && currentSelection.newDate() != null) {
-			// what was new is now old
-			oldSelectedDate = currentSelection.newDate();
-		}
+	public void fireSelectionEvent(LocalDate date) {
+		// what was new is now old
+		LocalDate oldSelectedDate = previousSelection == null ? null : previousSelection.newDate();
 
-		// new event, null indicates nothing was selected so textArea should clear
+		// new event, null indicates nothing was selected
 		LocalDate newSelectedDate = null;
-		if (label != null) {
+		Label dateLabel = findDateLabel(date);
+		if (dateLabel != null) {
 			newSelectedDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
-					Integer.parseInt(label.getText()));
-			setBorder(label);
+					Integer.parseInt(dateLabel.getText()));
+			setBorder(dateLabel);
 		}
 
-		// selection object
-		currentSelection = new DateSelection(oldSelectedDate, newSelectedDate);
+		// selection object, store as instance variable for later referral
+		previousSelection = new DateSelection(oldSelectedDate, newSelectedDate);
 
 		// fire event
-		SelectionEvent selectionEvent = new SelectionEvent(SelectionEvent.DATE_SELECTED, currentSelection);
-
+		SelectionEvent selectionEvent = new SelectionEvent(SelectionEvent.DATE_SELECTED, previousSelection);
 		dateGrid.fireEvent(selectionEvent);
 	}
 
@@ -216,7 +210,11 @@ public class CalendarController extends VBox {
 	 * @return {@link String}
 	 */
 	public DateSelection getCurrentSelection() {
-		return currentSelection;
+		return previousSelection;
+	}
+
+	private LocalDate getDate(Label label) {
+		return LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(), Integer.parseInt(label.getText()));
 	}
 
 	/**
@@ -226,7 +224,7 @@ public class CalendarController extends VBox {
 	 */
 	public LocalDate getSelectedDate() {
 		return LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
-				currentSelection.newDate().getDayOfMonth());
+				previousSelection.newDate().getDayOfMonth());
 	}
 
 	@FXML
@@ -237,14 +235,6 @@ public class CalendarController extends VBox {
 
 		yearLabel.setText(String.valueOf(currentYearMonth.getYear()));
 		monthLabel.setText(currentYearMonth.getMonth().toString());
-
-		LocalDate now = LocalDate.now();
-		Label label = findDateLabel(now);
-		if (label != null) {
-			label.setFont(Font.font(label.getFont().getFamily(), FontWeight.EXTRA_BOLD, FontPosture.REGULAR, 14.0));
-			label.getStyleClass().add("today");
-			fireSelectionEvent(label);
-		}
 	}
 
 	/**
@@ -308,7 +298,7 @@ public class CalendarController extends VBox {
 	public void selectDayOfMonth(int day) {
 		Node node = dateGrid.getChildrenUnmodifiable().get(day - 1);
 		if (node instanceof Label label) {
-			fireSelectionEvent(label);
+			fireSelectionEvent(getDate(label));
 		}
 	}
 

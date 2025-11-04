@@ -29,4 +29,9 @@ public class SelectionEvent extends Event {
 		return selection;
 	}
 
+	@Override
+	public String toString() {
+		return "SelectionEvent [selection=" + selection + "]";
+	}
+
 }

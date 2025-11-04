@@ -47,15 +47,16 @@ public class EditorPageController {
 			FXMLLoader loader = new FXMLLoader(resource);
 			calendar = loader.load();
 
-			// Listen for date selection events and update textArea
-			calendar.addEventHandler(SelectionEvent.DATE_SELECTED, this::onSelectionEvent);
-
 			Object object = loader.getController();
 			if (object instanceof CalendarController cController) {
 				calendarController = cController;
 				calendarWrapper.getChildren().add(calendar);
 
-				calendarController.selectDayOfMonth(LocalDate.now().getDayOfMonth());
+				// Listen for date selection events and update textArea
+				calendarWrapper.addEventHandler(SelectionEvent.DATE_SELECTED, this::onSelectionEvent);
+
+				// select today
+				calendarController.fireSelectionEvent(LocalDate.now());
 			}
 
 			// mark title dirty on text change
@@ -73,8 +74,6 @@ public class EditorPageController {
 			calendarController.drawMonth(yearMonth);
 			calendarController.selectDayOfMonth(firstEntryDate.getDayOfMonth());
 		}
-		setDirty(false);
-		textArea.requestFocus();
 	}
 
 	@FXML
@@ -85,8 +84,6 @@ public class EditorPageController {
 			calendarController.drawMonth(yearMonth);
 			calendarController.selectDayOfMonth(lastEntryDate.getDayOfMonth());
 		}
-		setDirty(false);
-		textArea.requestFocus();
 	}
 
 	@FXML
@@ -97,8 +94,6 @@ public class EditorPageController {
 			YearMonth newYearMonth = YearMonth.of(nextEntryDate.getYear(), nextEntryDate.getMonth());
 			calendarController.drawMonth(newYearMonth);
 			calendarController.selectDayOfMonth(nextEntryDate.getDayOfMonth());
-			setDirty(false);
-			textArea.requestFocus();
 		}
 	}
 
@@ -110,8 +105,6 @@ public class EditorPageController {
 			YearMonth newYearMonth = YearMonth.of(previousEntryDate.getYear(), previousEntryDate.getMonth());
 			calendarController.drawMonth(newYearMonth);
 			calendarController.selectDayOfMonth(previousEntryDate.getDayOfMonth());
-			setDirty(false);
-			textArea.requestFocus();
 		}
 	}
 
@@ -133,34 +126,40 @@ public class EditorPageController {
 			LocalDate newDate = selectionEvent.getSelection().newDate();
 			String displayedText = textArea.getText();
 
-			try {
-				String oldEntry = JournalManager.getEntry(oldDate);
-
-				boolean datesEqual = oldDate.equals(newDate); // selected same day
-				boolean textsNull = displayedText == null && oldEntry == null;
-				boolean textsMatch = oldEntry != null && oldEntry.equals(displayedText);
-				boolean isDirty = !datesEqual && !textsNull && !textsMatch;
-
-				if (isDirty) {
-					// edits made, prompt to save then show newly selected entry
-					promptToSave(oldDate, displayedText);
+			if (JournalManager.hasDate(oldDate)) {
+				try {
+					String oldEntry = JournalManager.getEntry(oldDate);
+					boolean datesEqual = oldDate.equals(newDate); // selected same day
+					boolean textsNull = displayedText == null && oldEntry == null;
+					boolean textsMatch = oldEntry != null && oldEntry.equals(displayedText);
+					boolean isDirty = !datesEqual && !textsNull && !textsMatch;
+					if (isDirty) {
+						// edits made, prompt to save then show newly selected entry
+						promptToSave(oldDate, displayedText);
+					}
+				} catch (JournalException e) {
+					App.notify(e.getMessage());
 				}
-			} catch (JournalException e) {
-				App.notify(e.getMessage());
 			}
 
-			// old date edits saved or abandoned, display new entry
-			try {
-				if (newDate != null) {
+			// old date's entry edits saved or abandoned, display new entry
+			if (newDate != null && JournalManager.hasDate(newDate)) {
+				try {
 					String newEntry = JournalManager.getEntry(newDate);
 					textArea.setText(newEntry);
 					textArea.requestFocus();
+
+					calendarController.colorizeEntryDays();
+					setDirty(false);
+				} catch (JournalException e) {
+					App.notify(e.getMessage());
 				}
+			} else {
+				textArea.setText(null);
+				textArea.requestFocus();
 
 				calendarController.colorizeEntryDays();
 				setDirty(false);
-			} catch (JournalException e) {
-				App.notify(e.getMessage());
 			}
 		}
 		event.consume();
@@ -190,19 +189,9 @@ public class EditorPageController {
 
 	@FXML
 	private void onTodayAction() {
-		String text = textArea.getText();
 		LocalDate now = LocalDate.now();
-		try {
-			if (!calendarController.isSaved(now, text)) {
-				save(now, text);
-			}
-			calendarController.drawMonth(YearMonth.now());
-			calendarController.selectDayOfMonth(LocalDate.now().getDayOfMonth());
-			textArea.requestFocus();
-			setDirty(false);
-		} catch (JournalException e) {
-			App.notify(e.getMessage());
-		}
+		calendarController.drawMonth(YearMonth.now());
+		calendarController.selectDayOfMonth(now.getDayOfMonth());
 	}
 
 	/**
