@@ -6,7 +6,6 @@ import java.io.IOException;
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
 import ca.footeware.javafx.journal.model.JournalManager;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;

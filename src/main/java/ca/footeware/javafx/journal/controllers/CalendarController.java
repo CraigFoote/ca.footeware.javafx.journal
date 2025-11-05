@@ -164,7 +164,7 @@ public class CalendarController extends VBox {
 	private Label findDateLabel(LocalDate date) {
 		for (Node node : dateGrid.getChildren()) {
 			// if it's this year and month
-			if (currentYearMonth.getYear() == date.getYear() && currentYearMonth.getMonth() == date.getMonth()
+			if (date != null && currentYearMonth.getYear() == date.getYear() && currentYearMonth.getMonth() == date.getMonth()
 					&& node instanceof Label label) {
 
 				LocalDate nodeDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),

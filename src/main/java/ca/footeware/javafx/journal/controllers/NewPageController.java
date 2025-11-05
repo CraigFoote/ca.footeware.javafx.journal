@@ -16,6 +16,8 @@ import javafx.stage.DirectoryChooser;
  */
 public class NewPageController {
 
+	private static final String REVEAL = "reveal";
+
 	@FXML
 	private Button browseButton;
 
@@ -54,7 +56,7 @@ public class NewPageController {
 
 	@FXML
 	private void onShowPassword1Pressed() {
-		passwordField1.getStyleClass().add("reveal");
+		passwordField1.getStyleClass().add(REVEAL);
 		password1 = passwordField1.getText();
 		passwordField1.setPromptText(password1);
 		passwordField1.setText(null);
@@ -65,12 +67,12 @@ public class NewPageController {
 	private void onShowPassword1Released() {
 		passwordField1.setText(password1);
 		passwordField1.setPromptText(null);
-		passwordField1.getStyleClass().remove("reveal");
+		passwordField1.getStyleClass().remove(REVEAL);
 	}
 
 	@FXML
 	private void onShowPassword2Pressed() {
-		passwordField2.getStyleClass().add("reveal");
+		passwordField2.getStyleClass().add(REVEAL);
 		password2 = passwordField2.getText();
 		passwordField2.setPromptText(password2);
 		passwordField2.setText(null);
@@ -81,7 +83,7 @@ public class NewPageController {
 	private void onShowPassword2Released() {
 		passwordField2.setText(password2);
 		passwordField2.setPromptText(null);
-		passwordField2.getStyleClass().remove("reveal");
+		passwordField2.getStyleClass().remove(REVEAL);
 	}
 
 	@FXML

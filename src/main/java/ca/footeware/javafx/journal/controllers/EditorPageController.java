@@ -37,6 +37,32 @@ public class EditorPageController {
 	private TextArea textArea;
 
 	/**
+	 * Determine if the textArea has altered text and, if so, prompt the user to
+	 * save.
+	 *
+	 * @param oldDate {@link LocalDate}
+	 * @param newDate {@link LocalDate}
+	 */
+	private void checkDirty(LocalDate oldDate, LocalDate newDate) {
+		String displayedText = textArea.getText();
+		if (JournalManager.hasDate(oldDate)) {
+			try {
+				String oldEntry = JournalManager.getEntry(oldDate);
+				boolean datesEqual = oldDate.equals(newDate); // selected same day
+				boolean textsNull = displayedText == null && oldEntry == null;
+				boolean textsMatch = oldEntry != null && oldEntry.equals(displayedText);
+				boolean isDirty = !datesEqual && !textsNull && !textsMatch;
+				if (isDirty) {
+					// edits made, prompt to save then show newly selected entry
+					promptToSave(oldDate, displayedText);
+				}
+			} catch (JournalException e) {
+				App.notify(e.getMessage());
+			}
+		}
+	}
+
+	/**
 	 * Called after injection of widgets.
 	 */
 	@FXML
@@ -124,23 +150,8 @@ public class EditorPageController {
 		if (event instanceof SelectionEvent selectionEvent) {
 			LocalDate oldDate = selectionEvent.getSelection().oldDate();
 			LocalDate newDate = selectionEvent.getSelection().newDate();
-			String displayedText = textArea.getText();
 
-			if (JournalManager.hasDate(oldDate)) {
-				try {
-					String oldEntry = JournalManager.getEntry(oldDate);
-					boolean datesEqual = oldDate.equals(newDate); // selected same day
-					boolean textsNull = displayedText == null && oldEntry == null;
-					boolean textsMatch = oldEntry != null && oldEntry.equals(displayedText);
-					boolean isDirty = !datesEqual && !textsNull && !textsMatch;
-					if (isDirty) {
-						// edits made, prompt to save then show newly selected entry
-						promptToSave(oldDate, displayedText);
-					}
-				} catch (JournalException e) {
-					App.notify(e.getMessage());
-				}
-			}
+			checkDirty(oldDate, newDate);
 
 			// old date's entry edits saved or abandoned, display new entry
 			if (newDate != null && JournalManager.hasDate(newDate)) {
@@ -176,7 +187,7 @@ public class EditorPageController {
 			try {
 				String entry = JournalManager.getEntry(currentSelection.newDate());
 				if ((newValue != null && newValue.equals(entry)) || (entry != null && newValue == null)
-						|| (newValue != null && entry != null && !entry.equals(newValue))) {
+						|| (newValue != null && entry != null)) {
 					setDirty(true);
 				}
 			} catch (JournalException e) {
