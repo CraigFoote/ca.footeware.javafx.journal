@@ -75,9 +75,14 @@ public class JournalManager {
 	 * @throws JournalException
 	 */
 	public static String getEntry(LocalDate date) throws JournalException {
-		String formatted = date.format(dateFormatter);
 		try {
+			if (date == null) {
+				throw new IllegalArgumentException("Provided date must not be null.");
+			}
+			String formatted = date.format(dateFormatter);
 			return journal.getEntry(formatted);
+		} catch (IllegalArgumentException e) {
+			throw new JournalException("Error: " + e.getMessage(), e);
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
 				| BadPaddingException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
 			throw new JournalException("Error fetching journal entry.", e);

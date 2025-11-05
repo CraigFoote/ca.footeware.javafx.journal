@@ -23,7 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 /**
- * MVC Controller for the "Editor" page.
+ * MVC pattern Controller for the "Editor" page.
  */
 public class EditorPageController {
 
@@ -44,8 +44,8 @@ public class EditorPageController {
 	 * @param newDate {@link LocalDate}
 	 */
 	private void checkDirty(LocalDate oldDate, LocalDate newDate) {
-		String displayedText = textArea.getText();
-		if (JournalManager.hasDate(oldDate)) {
+		if (oldDate != null) {
+			String displayedText = textArea.getText();
 			try {
 				String oldEntry = JournalManager.getEntry(oldDate);
 				boolean datesEqual = oldDate.equals(newDate); // selected same day
