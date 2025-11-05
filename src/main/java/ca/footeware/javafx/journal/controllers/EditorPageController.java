@@ -49,9 +49,9 @@ public class EditorPageController {
 			try {
 				String oldEntry = JournalManager.getEntry(oldDate);
 				boolean datesEqual = oldDate.equals(newDate); // selected same day
-				boolean textsNull = displayedText == null && oldEntry == null;
+				boolean noEntry = (displayedText == null || displayedText.isEmpty()) && oldEntry == null;
 				boolean textsMatch = oldEntry != null && oldEntry.equals(displayedText);
-				boolean isDirty = !datesEqual && !textsNull && !textsMatch;
+				boolean isDirty = !datesEqual && !noEntry && !textsMatch;
 				if (isDirty) {
 					// edits made, prompt to save then show newly selected entry
 					promptToSave(oldDate, displayedText);

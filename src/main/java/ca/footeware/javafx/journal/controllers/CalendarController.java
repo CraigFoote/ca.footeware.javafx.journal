@@ -183,7 +183,7 @@ public class CalendarController extends VBox {
 	 *
 	 * @param label {@link Label} the originating control
 	 */
-	public void fireSelectionEvent(LocalDate date) {
+	public synchronized void fireSelectionEvent(LocalDate date) {
 		// what was new is now old
 		LocalDate oldSelectedDate = previousSelection == null ? null : previousSelection.newDate();
 
