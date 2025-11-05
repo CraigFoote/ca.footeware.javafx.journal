@@ -6,9 +6,10 @@ import java.io.IOException;
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
 import ca.footeware.javafx.journal.model.JournalManager;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.control.PasswordField;
 import javafx.stage.FileChooser;
 
 /**
@@ -19,8 +20,10 @@ public class OpenPageController {
 	@FXML
 	private Button browseButton;
 
+	private String password;
+
 	@FXML
-	private TextField passwordField;
+	private PasswordField passwordField;
 
 	@FXML
 	private void onBrowseForJournalAction() {
@@ -40,6 +43,22 @@ public class OpenPageController {
 		} catch (IOException | JournalException | IllegalArgumentException e) {
 			App.notify(e.getMessage());
 		}
+	}
+
+	@FXML
+	private void onShowPasswordPressed() {
+		passwordField.getStyleClass().add("reveal");
+		password = passwordField.getText();
+		passwordField.setPromptText(password);
+		passwordField.setText(null);
+		passwordField.getParent().requestFocus();
+	}
+
+	@FXML
+	private void onShowPasswordReleased() {
+		passwordField.setText(password);
+		passwordField.setPromptText(null);
+		passwordField.getStyleClass().remove("reveal");
 	}
 
 	@FXML

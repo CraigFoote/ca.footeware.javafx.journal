@@ -16,10 +16,19 @@
     -fx-stroke-width: 5.0;
 }
 
-.nav .saveButton {
-	-fx-padding: 5.0;
+.nav, .saveButton, .showPasswordButton {
+	-fx-label-padding: 2.0;
 }
 
 .today {
     -fx-text-fill: #7FFF00;
+}
+
+.showPasswordButton {
+	-fx-width: 40px;
+	-fx-height: 40px;
+}
+
+.reveal {
+	-fx-background-color: whitesmoke;
 }

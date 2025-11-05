@@ -7,6 +7,7 @@ import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.model.JournalManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 
@@ -21,11 +22,14 @@ public class NewPageController {
 	@FXML
 	private TextField nameField;
 
-	@FXML
-	private TextField passwordField1;
+	private String password1;
+
+	private String password2;
 
 	@FXML
-	private TextField passwordField2;
+	private PasswordField passwordField1;
+	@FXML
+	private PasswordField passwordField2;
 
 	@FXML
 	private void onBrowseForJournalFolderAction() {
@@ -46,6 +50,38 @@ public class NewPageController {
 		} catch (IllegalArgumentException | IOException e) {
 			App.notify(e.getMessage());
 		}
+	}
+
+	@FXML
+	private void onShowPassword1Pressed() {
+		passwordField1.getStyleClass().add("reveal");
+		password1 = passwordField1.getText();
+		passwordField1.setPromptText(password1);
+		passwordField1.setText(null);
+		passwordField1.getParent().requestFocus();
+	}
+
+	@FXML
+	private void onShowPassword1Released() {
+		passwordField1.setText(password1);
+		passwordField1.setPromptText(null);
+		passwordField1.getStyleClass().remove("reveal");
+	}
+
+	@FXML
+	private void onShowPassword2Pressed() {
+		passwordField2.getStyleClass().add("reveal");
+		password2 = passwordField2.getText();
+		passwordField2.setPromptText(password2);
+		passwordField2.setText(null);
+		passwordField2.getParent().requestFocus();
+	}
+
+	@FXML
+	private void onShowPassword2Released() {
+		passwordField2.setText(password2);
+		passwordField2.setPromptText(null);
+		passwordField2.getStyleClass().remove("reveal");
 	}
 
 	@FXML

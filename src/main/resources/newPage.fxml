@@ -9,6 +9,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
@@ -53,17 +54,33 @@
          <font>
             <Font size="16.0" />
          </font></Button>
-      <PasswordField fx:id="passwordField1" prefHeight="0.0" prefWidth="299.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-         <GridPane.margin>
-            <Insets right="20.0" />
-         </GridPane.margin>
-         <font>
-            <Font size="16.0" />
-         </font>
-      </PasswordField>
+      <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+         <children>
+            <PasswordField fx:id="passwordField1" prefHeight="28.0" prefWidth="293.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </PasswordField>
+            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMousePressed="#onShowPassword1Pressed" onMouseReleased="#onShowPassword1Released" prefHeight="30.0" prefWidth="30.0" styleClass="showPasswordButton" stylesheets="@styles.css" textFill="WHITE">
+               <font>
+                  <Font size="26.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <graphic>
+                  <ImageView fx:id="showPassword1Button" fitHeight="14.0" fitWidth="20.0" onMousePressed="#onShowPassword1Pressed" onMouseReleased="#onShowPassword1Released" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@eye.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+      </HBox>
       <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onCreateJournalAction" text="Create Journal" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
          <GridPane.margin>
             <Insets right="20.0" />
@@ -86,17 +103,33 @@
             <Insets left="20.0" />
          </GridPane.margin>
       </Label>
-      <PasswordField fx:id="passwordField2" prefHeight="0.0" prefWidth="299.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-         <GridPane.margin>
-            <Insets right="20.0" />
-         </GridPane.margin>
-         <font>
-            <Font size="16.0" />
-         </font>
-      </PasswordField>
+      <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+         <children>
+            <PasswordField fx:id="passwordField2" prefHeight="28.0" prefWidth="293.0">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </PasswordField>
+            <Button alignment="CENTER" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMousePressed="#onShowPassword2Pressed" onMouseReleased="#onShowPassword2Released" prefHeight="30.0" prefWidth="30.0" styleClass="showPasswordButton" stylesheets="@styles.css" textFill="WHITE">
+               <font>
+                  <Font size="26.0" />
+               </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <graphic>
+                  <ImageView fx:id="showPassword2Button" fitHeight="14.0" fitWidth="20.0" onMousePressed="#onShowPassword2Pressed" onMouseReleased="#onShowPassword2Released" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@eye.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+      </HBox>
       <Label text="File name" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets left="20.0" />
