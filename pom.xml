@@ -42,14 +42,7 @@
 		</dependency>
     </dependencies>
     
-    <repositories>
-	    <repository>
-	        <id>my-local-repo</id>
-	        <url>file:${basedir}\lib\DateChooser.jar</url>
-	    </repository>
-	</repositories>
-    
-    <build>
+ 	<build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
