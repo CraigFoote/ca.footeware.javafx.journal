@@ -8,8 +8,7 @@ import ca.footeware.javafx.journal.model.JournalManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 /**
  * MVC Controller for the "Open" page.
@@ -20,9 +19,6 @@ public class NewPageController {
 
 	@FXML
 	private Button browseButton;
-
-	@FXML
-	private TextField nameField;
 
 	private String password1;
 
@@ -35,10 +31,10 @@ public class NewPageController {
 
 	@FXML
 	private void onBrowseForJournalFolderAction() {
-		DirectoryChooser directoryChooser = new DirectoryChooser();
-		File selectedDirectory = directoryChooser.showDialog(App.getPrimaryStage());
-		if (selectedDirectory != null) {
-			browseButton.setText(selectedDirectory.getAbsolutePath());
+		FileChooser fileChooser = new FileChooser();
+		File selected = fileChooser.showSaveDialog(App.getPrimaryStage());
+		if (selected != null) {
+			browseButton.setText(selected.getAbsolutePath());
 		}
 	}
 
@@ -46,8 +42,7 @@ public class NewPageController {
 	private void onCreateJournalAction() {
 		try {
 			verifyInputs();
-			JournalManager.createNewJournal(browseButton.getText(), nameField.getText().trim(),
-					passwordField1.getText());
+			JournalManager.createNewJournal(browseButton.getText(), passwordField1.getText());
 			App.setRoot("/editorPage");
 		} catch (IllegalArgumentException | IOException e) {
 			App.notify(e.getMessage());
@@ -94,9 +89,6 @@ public class NewPageController {
 	private void verifyInputs() {
 		if (browseButton.getText().equals("Browse")) {
 			throw new IllegalArgumentException("No location selected");
-		}
-		if (nameField.getText().trim().isBlank()) {
-			throw new IllegalArgumentException("Name field is blank");
 		}
 		if (passwordField1.getText().isBlank() || passwordField2.getText().isBlank()) {
 			throw new IllegalArgumentException("A password field is blank");

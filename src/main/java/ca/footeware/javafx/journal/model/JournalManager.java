@@ -51,12 +51,11 @@ public class JournalManager {
 	 * password.
 	 *
 	 * @param path     {@link String}
-	 * @param name     {@link String}
 	 * @param password {@link String}
 	 * @throws IOException
 	 */
-	public static void createNewJournal(String path, String name, String password) throws IOException {
-		File file = new File(path + File.separator + name);
+	public static void createNewJournal(String path, String password) throws IOException {
+		File file = new File(path);
 		if (file.exists()) {
 			throw new IOException("File already exists: " + file.getAbsolutePath());
 		}
