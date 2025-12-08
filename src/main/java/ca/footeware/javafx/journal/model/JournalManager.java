@@ -49,10 +49,15 @@ public class JournalManager {
 	/**
 	 * Creates a new journal at the specified pathName with the specified password.
 	 *
+<<<<<<< HEAD
 	 * @param pathName {@link String}
+=======
+	 * @param path     {@link String}
+>>>>>>> branch 'master' of https://github.com/CraigFoote/ca.footeware.javafx.journal.git
 	 * @param password {@link String}
 	 * @throws IOException
 	 */
+<<<<<<< HEAD
 	public static void createNewJournal(String pathName, String password) throws IOException {
 		File file = new File(pathName);
 		if (!file.exists()) {
@@ -60,6 +65,16 @@ public class JournalManager {
 			if (!newFileCreated) {
 				throw new IOException("Unknown error, new file not created.");
 			}
+=======
+	public static void createNewJournal(String path, String password) throws IOException {
+		File file = new File(path);
+		if (file.exists()) {
+			throw new IOException("File already exists: " + file.getAbsolutePath());
+		}
+		boolean newFile = file.createNewFile();
+		if (!newFile) {
+			throw new IOException("");
+>>>>>>> branch 'master' of https://github.com/CraigFoote/ca.footeware.javafx.journal.git
 		}
 		journal = new Journal(file, password);
 		journal.save();

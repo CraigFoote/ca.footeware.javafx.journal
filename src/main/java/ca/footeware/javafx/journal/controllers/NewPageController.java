@@ -30,12 +30,20 @@ public class NewPageController {
 	private PasswordField passwordField2;
 
 	@FXML
+<<<<<<< HEAD
 	private void onBrowseForJournalAction() {
 		FileChooser fileChooser = new FileChooser();
 		File selectedFile = fileChooser.showSaveDialog(App.getPrimaryStage());
 		if (selectedFile != null) {
 			browseButton.setText(selectedFile.getAbsolutePath());
 			passwordField1.requestFocus();
+=======
+	private void onBrowseForJournalFolderAction() {
+		FileChooser fileChooser = new FileChooser();
+		File selected = fileChooser.showSaveDialog(App.getPrimaryStage());
+		if (selected != null) {
+			browseButton.setText(selected.getAbsolutePath());
+>>>>>>> branch 'master' of https://github.com/CraigFoote/ca.footeware.javafx.journal.git
 		}
 	}
 
