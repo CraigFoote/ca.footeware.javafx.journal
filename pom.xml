@@ -42,11 +42,7 @@
 		</dependency>
     </dependencies>
     
-<<<<<<< HEAD
-    <build>
-=======
  	<build>
->>>>>>> branch 'master' of https://github.com/CraigFoote/ca.footeware.javafx.journal.git
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

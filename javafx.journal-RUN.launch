@@ -23,5 +23,6 @@
     </listAttribute>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="javafx.journal"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="javafx.journal"/>
+    <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
     <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="--enable-native-access=ALL-UNNAMED"/>
 </launchConfiguration>
