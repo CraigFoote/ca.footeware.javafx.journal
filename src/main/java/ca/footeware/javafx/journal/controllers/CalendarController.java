@@ -164,8 +164,8 @@ public class CalendarController extends VBox {
 	private Label findDateLabel(LocalDate date) {
 		for (Node node : dateGrid.getChildren()) {
 			// if it's this year and month
-			if (date != null && currentYearMonth.getYear() == date.getYear() && currentYearMonth.getMonth() == date.getMonth()
-					&& node instanceof Label label) {
+			if (date != null && currentYearMonth.getYear() == date.getYear()
+					&& currentYearMonth.getMonth() == date.getMonth() && node instanceof Label label) {
 
 				LocalDate nodeDate = LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
 						Integer.parseInt(label.getText()));
@@ -181,7 +181,7 @@ public class CalendarController extends VBox {
 	/**
 	 * Creates and fires a selection event.
 	 *
-	 * @param label {@link Label} the originating control
+	 * @param date {@link LocalDate} the originating control
 	 */
 	public synchronized void fireSelectionEvent(LocalDate date) {
 		// what was new is now old
@@ -293,7 +293,6 @@ public class CalendarController extends VBox {
 	 * selection event.
 	 *
 	 * @param day int
-	 * @throws JournalException when ice-cream has bones in it
 	 */
 	public void selectDayOfMonth(int day) {
 		Node node = dateGrid.getChildrenUnmodifiable().get(day - 1);

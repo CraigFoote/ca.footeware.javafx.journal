@@ -30,6 +30,7 @@ public class OpenPageController {
 		File theChosenOne = fileChooser.showOpenDialog(App.getPrimaryStage());
 		if (theChosenOne != null) {
 			browseButton.setText(theChosenOne.getAbsolutePath());
+			passwordField.requestFocus();
 		}
 	}
 
