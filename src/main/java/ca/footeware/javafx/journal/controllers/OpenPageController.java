@@ -6,10 +6,13 @@ import java.io.IOException;
 import ca.footeware.javafx.journal.App;
 import ca.footeware.javafx.journal.exceptions.JournalException;
 import ca.footeware.javafx.journal.model.JournalManager;
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 
 /**
  * MVC Controller for the "Open" page.
@@ -18,6 +21,9 @@ public class OpenPageController {
 
 	@FXML
 	private Button browseButton;
+
+	@FXML
+	private ImageView key;
 
 	private String password;
 
@@ -39,7 +45,17 @@ public class OpenPageController {
 		try {
 			verifyInputs();
 			JournalManager.openJournal(browseButton.getText(), passwordField.getText());
-			App.setRoot("/editorPage");
+			FadeTransition transition = new FadeTransition(Duration.seconds(2), key);
+			transition.setFromValue(1.0);
+			transition.setToValue(0.0);
+			transition.onFinishedProperty().set(_ -> {
+				try {
+					App.setRoot("/editorPage");
+				} catch (IOException e) {
+					App.notify(e.getMessage());
+				}
+			});
+			transition.play();
 		} catch (IOException | JournalException | IllegalArgumentException e) {
 			App.notify(e.getMessage());
 		}
