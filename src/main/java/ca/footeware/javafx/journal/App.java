@@ -87,6 +87,14 @@ public class App extends Application {
 		scheduler.schedule(closer, 5, TimeUnit.SECONDS);
 	}
 
+	public static void openUrl(String url) {
+		try {
+			new ProcessBuilder("x-www-browser", url).start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Loads the provided FXML file and passes its parent root to the notification
 	 * pane to be set as its child widget.

@@ -36,3 +36,7 @@
 .content {
 	-fx-font-size: 24px;
 }
+
+#programmer {
+	-fx-cursor: hand;
+}

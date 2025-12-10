@@ -19,6 +19,8 @@ public class HomePageController {
 		Alert alert = new Alert(AlertType.NONE);
 		Image image = new Image(getClass().getResource("/programmer.jpg").toExternalForm());
 		ImageView imageView = new ImageView(image);
+		imageView.setId("programmer");
+		imageView.setOnMouseClicked(_ -> App.openUrl("https://footeware.ca"));
 		alert.setGraphic(imageView);
 		alert.initModality(Modality.APPLICATION_MODAL);
 		alert.initOwner(App.getPrimaryStage());
