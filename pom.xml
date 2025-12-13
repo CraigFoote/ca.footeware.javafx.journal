@@ -4,7 +4,7 @@
     
     <groupId>ca.footeware</groupId>
     <artifactId>javafx.journal</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,29 +16,30 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>25</version>
+            <version>25.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>25</version>
+            <version>25.0.1</version>
         </dependency>
         <dependency>
 		    <groupId>org.openjfx</groupId>
 		    <artifactId>javafx-graphics</artifactId>
-		    <version>25</version>
+		    <version>25.0.1</version>
 		    <classifier>linux</classifier>
 		</dependency>
 		<dependency>
 		    <groupId>org.openjfx</groupId>
 		    <artifactId>javafx-graphics</artifactId>
-		    <version>25</version>
+		    <version>25.0.1</version>
 		    <classifier>win</classifier>
 		</dependency>
+		<!--notoification toaster-->
 		<dependency>
 		    <groupId>org.controlsfx</groupId>
 		    <artifactId>controlsfx</artifactId>
-		    <version>11.2.2</version>
+		    <version>11.2.3</version>
 		</dependency>
     </dependencies>
     
