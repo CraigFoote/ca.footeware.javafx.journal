@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.Preferences;
 
 import org.controlsfx.control.NotificationPane;
 
@@ -108,6 +109,8 @@ public class App extends Application {
 		notificationPane.setContent(page);
 	}
 
+	private Preferences preferences;
+
 	@Override
 	public void start(Stage stage) throws IOException, URISyntaxException {
 		// scene > container with [progressBar, notificationPane > page]
@@ -132,7 +135,11 @@ public class App extends Application {
 		notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
 		container.getChildren().add(notificationPane);
 
-		scene = new Scene(container, 500, 700);
+		preferences = Preferences.userNodeForPackage(getClass());
+		double width = preferences.getDouble("stage.width", 500);
+		double height = preferences.getDouble("stage.height", 700);
+
+		scene = new Scene(container, width, height);
 		URL resource = App.class.getResource("/styles.css");
 		scene.getStylesheets().add(resource.toExternalForm());
 		Image icon = new Image(getClass().getResourceAsStream("/journal-goldkey.png"));
@@ -140,5 +147,11 @@ public class App extends Application {
 		stage.setTitle("Journal");
 		stage.setScene(scene);
 		stage.show();
+	}
+
+	@Override
+	public void stop() throws Exception {
+		preferences.putDouble("stage.width", getPrimaryStage().getWidth());
+		preferences.putDouble("stage.height", getPrimaryStage().getHeight());
 	}
 }

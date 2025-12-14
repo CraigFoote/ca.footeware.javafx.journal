@@ -51,7 +51,7 @@
          </font></Button>
       <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="371.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
          <children>
-            <PasswordField fx:id="passwordField" prefHeight="28.0" prefWidth="310.0">
+            <PasswordField fx:id="passwordField" prefHeight="28.0" prefWidth="310.0" HBox.hgrow="ALWAYS">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
