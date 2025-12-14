@@ -220,11 +220,14 @@ public class CalendarController extends VBox {
 	/**
 	 * Gets the currently selected date.
 	 *
-	 * @return {@link LocalDate}
+	 * @return {@link LocalDate} may be null if no date is selected
 	 */
 	public LocalDate getSelectedDate() {
-		return LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
-				previousSelection.newDate().getDayOfMonth());
+		if (currentYearMonth != null && previousSelection != null && previousSelection.newDate() != null) {
+			return LocalDate.of(currentYearMonth.getYear(), currentYearMonth.getMonth(),
+					previousSelection.newDate().getDayOfMonth());
+		}
+		return null;
 	}
 
 	@FXML
