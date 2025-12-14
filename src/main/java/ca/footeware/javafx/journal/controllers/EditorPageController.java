@@ -115,30 +115,36 @@ public class EditorPageController {
 	@FXML
 	private void onNextEntryAction() {
 		LocalDate selectedDate = calendarController.getSelectedDate();
-		LocalDate nextEntryDate = JournalManager.getNextEntryDate(selectedDate);
-		if (!selectedDate.equals(nextEntryDate)) {
-			YearMonth newYearMonth = YearMonth.of(nextEntryDate.getYear(), nextEntryDate.getMonth());
-			calendarController.drawMonth(newYearMonth);
-			calendarController.selectDayOfMonth(nextEntryDate.getDayOfMonth());
+		if (selectedDate != null) {
+			LocalDate nextEntryDate = JournalManager.getNextEntryDate(selectedDate);
+			if (!selectedDate.equals(nextEntryDate)) {
+				YearMonth newYearMonth = YearMonth.of(nextEntryDate.getYear(), nextEntryDate.getMonth());
+				calendarController.drawMonth(newYearMonth);
+				calendarController.selectDayOfMonth(nextEntryDate.getDayOfMonth());
+			}
 		}
 	}
 
 	@FXML
 	private void onPreviousEntryAction() {
 		LocalDate selectedDate = calendarController.getSelectedDate();
-		LocalDate previousEntryDate = JournalManager.getPreviousEntryDate(selectedDate);
-		if (!selectedDate.equals(previousEntryDate)) {
-			YearMonth newYearMonth = YearMonth.of(previousEntryDate.getYear(), previousEntryDate.getMonth());
-			calendarController.drawMonth(newYearMonth);
-			calendarController.selectDayOfMonth(previousEntryDate.getDayOfMonth());
+		if (selectedDate != null) {
+			LocalDate previousEntryDate = JournalManager.getPreviousEntryDate(selectedDate);
+			if (!selectedDate.equals(previousEntryDate)) {
+				YearMonth newYearMonth = YearMonth.of(previousEntryDate.getYear(), previousEntryDate.getMonth());
+				calendarController.drawMonth(newYearMonth);
+				calendarController.selectDayOfMonth(previousEntryDate.getDayOfMonth());
+			}
 		}
 	}
 
 	@FXML
 	private void onSaveAction() {
 		LocalDate selectedDate = calendarController.getSelectedDate();
-		String text = textArea.getText();
-		save(selectedDate, text);
+		if (selectedDate != null) {
+			String text = textArea.getText();
+			save(selectedDate, text);
+		}
 	}
 
 	/**
