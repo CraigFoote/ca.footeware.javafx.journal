@@ -14,7 +14,7 @@
    <children>
       <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@/journal-goldkey.png" />
+            <Image url="@/journal.png" />
          </image>
          <VBox.margin>
             <Insets bottom="50.0" />

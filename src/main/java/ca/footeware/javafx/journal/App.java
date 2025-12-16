@@ -142,7 +142,7 @@ public class App extends Application {
 		scene = new Scene(container, width, height);
 		URL resource = App.class.getResource("/styles.css");
 		scene.getStylesheets().add(resource.toExternalForm());
-		Image icon = new Image(getClass().getResourceAsStream("/journal-goldkey.png"));
+		Image icon = new Image(getClass().getResourceAsStream("/journal.png"));
 		stage.getIcons().add(icon);
 		stage.setTitle("Journal");
 		stage.setScene(scene);
