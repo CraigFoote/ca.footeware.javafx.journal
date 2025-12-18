@@ -1,7 +1,7 @@
 .root { 
-    -fx-accent: #ff0004;
+    -fx-accent: #BF4040;
     -fx-focus-color: -fx-accent;
-    -fx-base: #20242a;
+    -fx-base:#63452C;
     -fx-font-size: 12.0;
 }
 
@@ -17,7 +17,7 @@
 }
 
 .nav, .saveButton, .showPasswordButton {
-	-fx-label-padding: 2.0;
+	-fx-label-padding: 1.0;
 }
 
 .today {

@@ -92,7 +92,7 @@ public class App extends Application {
 		try {
 			new ProcessBuilder("x-www-browser", url).start();
 		} catch (IOException e) {
-			e.printStackTrace();
+			notify(e.getMessage());
 		}
 	}
 

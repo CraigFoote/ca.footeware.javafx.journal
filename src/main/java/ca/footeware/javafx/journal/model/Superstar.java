@@ -128,5 +128,6 @@ public class Superstar {
 	 * Constructor, hidden because all methods are static.
 	 */
 	private Superstar() {
+		// empty
 	}
 }
